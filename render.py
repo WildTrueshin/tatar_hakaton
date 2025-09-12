@@ -8,19 +8,24 @@ from data_helper import *
 pygame.init()
 
 info = pygame.display.Info()
-WIDTH, HEIGHT = info.current_w, info.current_h
+HEIGHT = info.current_h
+WIDTH = int(HEIGHT * 16 / 9)
+SCALE = HEIGHT / 1000
 FPS = 30
+DIALOG_COLOR = (246, 235, 165)
+TEXT_COLOR = (41, 43, 51)
+DIALOG_HEIGHT = int(HEIGHT / 5)
+DIALOG_FONT = pygame.font.SysFont("consolas", int(HEIGHT / 40))
+BORDER_COLOR = (117, 117, 56)
+BORDER_WIDTH = int(HEIGHT / 320)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("chehfgerg")
+pygame.display.set_caption("Checheck game")
 clock = pygame.time.Clock()
-
-dialog_font = pygame.font.SysFont("consolas", 40)
 
 data = load_game()
 print(data)
 current_scene: Scene = scenes.scenes[data["scene"]]
-current_scene_name = data["scene"]
 
 running = True
 while running:
@@ -29,12 +34,39 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                save_game(current_scene_name)
+                save_game(current_scene.get_name())
                 running = False
             if event.key == pygame.K_e:
-                new_scene = current_scene.interact()
-                if new_scene is not None:
-                    current_scene = new_scene
+                current_scene = current_scene.interact()
+    screen.fill((0, 0, 0))
+    scene_info = current_scene.get_draw_data()
+
+    sorted_objects = scene_info["objects"]
+    sorted_objects.append(scene_info["player"])
+    sorted_objects.sort(key=lambda obj: obj["z"])
+
+    for object in sorted_objects:
+        rect = object["rect"]
+        x_l = rect.x1 * SCALE
+        y_t = rect.y1 * SCALE
+        width = (rect.x2 - rect.x1) * SCALE
+        height = (rect.y2 - rect.y1) * SCALE
+
+        sprite = pygame.image.load(object["texture_path"]).convert_alpha()
+        sprite = pygame.transform.scale(sprite, (width, height))
+        rect = sprite.get_rect(topleft=(x_l, y_t))
+        screen.blit(sprite, rect)
+
+    if scene_info["ui"]["mode"] == "hint":
+        pass
+    if scene_info["ui"]["mode"] == "dialog":
+        dialog_rect = pygame.Rect(0, HEIGHT - DIALOG_HEIGHT, WIDTH, DIALOG_HEIGHT)
+        pygame.draw.rect(screen, DIALOG_COLOR, dialog_rect, border_radius=20)
+        pygame.draw.rect(screen, BORDER_COLOR, dialog_rect, border_radius=20, width=BORDER_WIDTH)
+        text_surface = DIALOG_FONT.render(scene_info["ui"]["text"], True, TEXT_COLOR)
+        text_rect = text_surface.get_rect(center=dialog_rect.center)
+        screen.blit(text_surface, text_rect)
+    else:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
             current_scene.move_forward()
@@ -44,36 +76,6 @@ while running:
             current_scene.move_left()
         if keys[pygame.K_d]:
             current_scene.move_right()
-
-
-    screen.fill((0, 0, 0))
-    scene_info = current_scene.get_draw_data()
-
-    for object in scene_info["objects"]:
-        rect = object["rect"]
-        x1 = int(rect.x1 * 5)
-        y1 = int(rect.y1 * 5)
-        x2 = int(rect.x2 * 5)
-        y2 = int(rect.y2 * 5)
-        pygame.draw.rect(screen, (100, 200, 50), (x1, y1, x2 - x1, y2 - y1))
-
-    player_rect = scene_info["player_rect"]
-    player_x1 = int(player_rect.x1 * 5)
-    player_y1 = int(player_rect.y1 * 5)
-    player_x2 = int(player_rect.x2 * 5)
-    player_y2 = int(player_rect.y2 * 5)
-    player_image = pygame.image.load("sprites/bhtiyar.png").convert_alpha()
-    player_image = pygame.transform.scale(player_image, (player_x2 - player_x1, player_y2 - player_y1))
-    player_rect = player_image.get_rect(topleft=(player_x1, player_y1))
-    screen.blit(player_image, player_rect)
-
-    if scene_info["ui"]["mode"] == "dialog":
-        text_surface = dialog_font.render(scene_info["ui"]["text"], True, (255, 0, 0))
-        DH = 200
-        rect = pygame.Rect(0, HEIGHT - DH, WIDTH, DH)
-        pygame.draw.rect(screen, (255, 255, 255), rect)
-        text_rect = text_surface.get_rect(center=rect.center)
-        screen.blit(text_surface, text_rect)
 
     pygame.display.flip()
     clock.tick(FPS)

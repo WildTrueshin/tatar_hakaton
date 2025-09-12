@@ -57,7 +57,7 @@ def make_scene_a() -> Scene:
         player_pos=(30, 90),
         player_size=(16, 16),
         interact_distance=28.0,
-        player_texture_path="assets/player/player_idle.png",
+        player_texture_path="sprites/player_idle.png",
         scale_player_texture_to_rect=True,
         player_z=10,
     )
