@@ -5,7 +5,8 @@ def make_scene_b() -> Scene:
         id="scene_b",
         objects=[],
         player_pos=(20, 20),
-        player_size=(16, 16)
+        player_size=(16, 16),
+        player_texture_path="assets/player/player_idle.png",
     )
 
 
@@ -17,7 +18,8 @@ def make_scene_a() -> Scene:
         solid=False,
         interactable=True,
         next_scene_factory=make_scene_b,
-        sprite_id="spr_door"
+        texture_path="assets/props/door.png",
+        z=1,
     )
 
     wall = StaticObject(
@@ -26,7 +28,9 @@ def make_scene_a() -> Scene:
         rect=Rect(0, 0, 200, 16),
         solid=True,
         interactable=False,
-        sprite_id="spr_wall"
+        texture_path="assets/tiles/wall_top.png",
+        z=0,
+        scale_texture_to_rect=True,
     )
 
     granny = NPC(
@@ -41,9 +45,10 @@ def make_scene_a() -> Scene:
             "Учить — свет, не учить — тьма.",
             "Ладно, увидимся позже!"
         ],
-        sprite_id="spr_granny",
-        repeatable=False,      # после конца диалога NPC перестанет быть интерактивным
-        persist_progress=True  # можно отходить и возвращаться — диалог продолжится
+        repeatable=False,
+        persist_progress=True,
+        texture_path="assets/npc/granny.png",
+        z=2,
     )
 
     return Scene(
@@ -51,7 +56,10 @@ def make_scene_a() -> Scene:
         objects=[door, wall, granny],
         player_pos=(30, 90),
         player_size=(16, 16),
-        interact_distance=28.0
+        interact_distance=28.0,
+        player_texture_path="assets/player/player_idle.png",
+        scale_player_texture_to_rect=True,
+        player_z=10,
     )
 
 scenes = {
