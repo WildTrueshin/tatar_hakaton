@@ -62,9 +62,11 @@ while running:
     player_y1 = int(player_rect.y1 * 5)
     player_x2 = int(player_rect.x2 * 5)
     player_y2 = int(player_rect.y2 * 5)
-    pygame.draw.rect(screen, (255, 0, 0), (player_x1, player_y1, player_x2 - player_x1, player_y2 - player_y1))
+    player_image = pygame.image.load("sprites/bhtiyar.png").convert_alpha()
+    player_image = pygame.transform.scale(player_image, (player_x2 - player_x1, player_y2 - player_y1))
+    player_rect = player_image.get_rect(topleft=(player_x1, player_y1))
+    screen.blit(player_image, player_rect)
 
-    print(scene_info["ui"])
     if scene_info["ui"]["mode"] == "dialog":
         text_surface = dialog_font.render(scene_info["ui"]["text"], True, (255, 0, 0))
         DH = 200
