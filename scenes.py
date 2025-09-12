@@ -1,5 +1,5 @@
 
 
 scenes = {
-
+    "menu": None
 }
