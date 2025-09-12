@@ -78,13 +78,26 @@ SceneFactory = Callable[[], "Scene"]
 
 @dataclass
 class GameObject:
+    """
+    Базовый объект сцены.
+    - rect: границы объекта (левый-верхний и правый-нижний).
+    - solid: непроходимый?
+    - interactable: можно ли взаимодействовать?
+    - next_scene_factory: фабрика следующей сцены (при взаимодействии).
+    - texture_path: ПУТЬ к изображению (PNG и т.п.), хранится как строка.
+    - z: порядок отрисовки (чем больше, тем позже рисуется поверх).
+    """
     id: str
     rect: Rect
     solid: bool = False
     interactable: bool = False
     next_scene_factory: Optional[SceneFactory] = None
     name: Optional[str] = None
-    sprite_id: Optional[str] = None
+
+    texture_path: Optional[str] = None
+    z: int = 0
+    # Если True — текстуру масштабировать под rect при отрисовке.
+    scale_texture_to_rect: bool = True
 
     def on_interact(self, scene: "Scene") -> Optional["Scene"]:
         if self.next_scene_factory:
@@ -96,9 +109,8 @@ class GameObject:
 class NPC(GameObject):
     dialog_lines: List[str] = field(default_factory=list)
     _dialog_index: int = 0
-    # Новые поля:
-    repeatable: bool = False          # если False — после конца диалога NPC перестаёт быть интерактивным
-    persist_progress: bool = True     # если True — прогресс сохраняется между подходами
+    repeatable: bool = False
+    persist_progress: bool = True
 
     def has_dialog(self) -> bool:
         return len(self.dialog_lines) > 0
@@ -117,15 +129,10 @@ class NPC(GameObject):
         return None
 
     def on_dialog_finished(self) -> None:
-        """
-        Вызывается в момент, когда последняя реплика показана.
-        Если диалог не повторяемый — отключаем интерактивность.
-        """
         if not self.repeatable:
             self.interactable = False
 
     def on_interact(self, scene: "Scene") -> Optional["Scene"]:
-        # После завершения диалога — возможно переключение сцены
         if self.is_dialog_finished() and self.next_scene_factory:
             return self.next_scene_factory()
         return None
@@ -148,10 +155,20 @@ class Scene:
     player_size: Vec2 = (16, 16)
     text_window: TextWindow = field(default_factory=TextWindow)
     interact_distance: float = 24.0
+
+    # Путь к текстуре игрока:
+    player_texture_path: Optional[str] = None
+    # Масштабировать ли текстуру игрока под размер хитбокса:
+    scale_player_texture_to_rect: bool = True
+    # Порядок отрисовки игрока:
+    player_z: int = 10
+
     _active_dialog_npc_id: Optional[str] = None
 
+    # ---------- Служебные ----------
 
-    # ---------- Вспомогательные ----------
+    def _is_dialog_active(self) -> bool:
+        return self._active_dialog_npc_id is not None or self.text_window.mode == "dialog"
 
     def _player_rect(self, pos: Optional[Vec2] = None) -> Rect:
         x, y = pos if pos else self.player_pos
@@ -178,8 +195,7 @@ class Scene:
         return best_obj, best_dist
 
     def _update_hint(self) -> None:
-        # В ходе активного диалога подсказки не показываем
-        if self._active_dialog_npc_id is not None:
+        if self._is_dialog_active():
             return
         obj, dist = self._nearest_interactable()
         if obj and dist <= self.interact_distance:
@@ -188,13 +204,9 @@ class Scene:
             if self.text_window.mode == "hint":
                 self.text_window.hide()
 
-    def _is_dialog_active(self) -> bool:
-        return self._active_dialog_npc_id is not None or self.text_window.mode == "dialog"
-
-    # ---------- Перемещение ----------
+    # ---------- Перемещение (заблокировано при диалоге) ----------
 
     def _move(self, dx: float, dy: float) -> None:
-        # NEW: блокируем движение, если идёт диалог
         if self._is_dialog_active():
             return
 
@@ -209,119 +221,100 @@ class Scene:
         self._update_hint()
 
     def move_forward(self, step: float = 2.0) -> None:
-        if self._is_dialog_active():  # NEW
+        if self._is_dialog_active():
             return
         self._move(0, -step)
 
     def move_back(self, step: float = 2.0) -> None:
-        if self._is_dialog_active():  # NEW
+        if self._is_dialog_active():
             return
         self._move(0, step)
 
     def move_left(self, step: float = 2.0) -> None:
-        if self._is_dialog_active():  # NEW
+        if self._is_dialog_active():
             return
         self._move(-step, 0)
 
     def move_right(self, step: float = 2.0) -> None:
-        if self._is_dialog_active():  # NEW
+        if self._is_dialog_active():
             return
         self._move(step, 0)
 
     # ---------- Диалоги ----------
 
     def start_dialog_with(self, npc: NPC) -> None:
-        """
-        Начать (или продолжить) диалог с NPC.
-        - Если persist_progress=True и диалог уже начат, продолжим с текущего индекса.
-        - Если persist_progress=False, каждый раз начинаем сначала.
-        """
         if not npc.has_dialog():
             return
-
         if not npc.persist_progress or npc.is_dialog_finished():
             npc.reset_dialog()
-
         self._active_dialog_npc_id = npc.id
-        # Показать первую/текущую реплику
         line = npc.next_dialog_line()
         if line is not None:
             self.text_window.show_dialog(line, npc.id)
         else:
-            # нет строк — ничего не показываем
             self._active_dialog_npc_id = None
             self.text_window.hide()
 
     def next_dialog_step(self) -> Optional["Scene"]:
-        """
-        Переход к следующей реплике активного диалога.
-        Когда реплики заканчиваются — скрыть окно, завершить диалог, при необходимости
-        отключить NPC и потенциально переключить сцену.
-        """
         if self._active_dialog_npc_id is None:
             return None
-
         npc = next((o for o in self.objects if isinstance(o, NPC) and o.id == self._active_dialog_npc_id), None)
         if npc is None:
-            # NPC исчез — завершить
             self._active_dialog_npc_id = None
             self.text_window.hide()
             return None
-
         line = npc.next_dialog_line()
         if line is not None:
             self.text_window.show_dialog(line, npc.id)
             return None
-
-        # Диалог завершён
         npc.on_dialog_finished()
         self._active_dialog_npc_id = None
         self.text_window.hide()
-        # Возможная смена сцены
         return npc.on_interact(self)
 
     # ---------- Взаимодействие (E) ----------
 
     def unteract(self) -> Optional["Scene"]:
-        """
-        Если сейчас идёт диалог — показать следующую реплику.
-        Иначе — начать диалог с ближайшим NPC или выполнить on_interact() у другого объекта.
-        """
-        # Продолжаем текущий диалог, если он активен
         if self._active_dialog_npc_id is not None:
             return self.next_dialog_step()
-
-        # Ищем ближайший интерактивный объект
         obj, dist = self._nearest_interactable()
         if obj is None or dist > self.interact_distance:
             return None
-
-        # Диалог с NPC
         if isinstance(obj, NPC) and obj.has_dialog() and (not obj.is_dialog_finished() or obj.repeatable):
             self.start_dialog_with(obj)
             return None
-
-        # Обычный интерактив
         return obj.on_interact(self)
 
     def interact(self) -> Optional["Scene"]:
         return self.unteract()
 
-    # ---------- Данные для рендера ----------
+    # ---------- Данные для рендера (включая пути к текстурам) ----------
 
     def get_draw_data(self) -> dict:
+        """
+        Возвращает структуру для рендера:
+        - player: rect, texture_path, z
+        - objects: список словарей с rect, texture_path, z и пр.
+        - ui: состояние текстового окна
+        """
         return {
-            "player_rect": self._player_rect(),
+            "player": {
+                "rect": self._player_rect(),
+                "texture_path": self.player_texture_path,
+                "scale_to_rect": self.scale_player_texture_to_rect,
+                "z": self.player_z,
+            },
             "objects": [
                 {
                     "id": o.id,
                     "name": o.name,
-                    "sprite_id": o.sprite_id,
                     "rect": o.rect,
                     "solid": o.solid,
                     "interactable": o.interactable,
                     "type": "NPC" if isinstance(o, NPC) else "Static",
-                    # Немного отладочной инфы по диалогу
+                    "texture_path": o.texture_path,
+                    "scale_to_rect": o.scale_texture_to_rect,
+                    "z": o.z,
                     "dialog_index": getattr(o, "_dialog_index", None) if isinstance(o, NPC) else None,
                     "dialog_len": len(o.dialog_lines) if isinstance(o, NPC) else None,
                 }
@@ -334,3 +327,4 @@ class Scene:
                 "dialog_active_with": self._active_dialog_npc_id,
             },
         }
+
