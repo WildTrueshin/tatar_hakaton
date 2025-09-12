@@ -148,8 +148,8 @@ class Scene:
     player_size: Vec2 = (16, 16)
     text_window: TextWindow = field(default_factory=TextWindow)
     interact_distance: float = 24.0
-
     _active_dialog_npc_id: Optional[str] = None
+
 
     # ---------- Вспомогательные ----------
 
@@ -188,9 +188,16 @@ class Scene:
             if self.text_window.mode == "hint":
                 self.text_window.hide()
 
+    def _is_dialog_active(self) -> bool:
+        return self._active_dialog_npc_id is not None or self.text_window.mode == "dialog"
+
     # ---------- Перемещение ----------
 
     def _move(self, dx: float, dy: float) -> None:
+        # NEW: блокируем движение, если идёт диалог
+        if self._is_dialog_active():
+            return
+
         new_rect_x = self._player_rect().moved(dx, 0)
         if not self._collides_with_solid(new_rect_x):
             self.player_pos = (self.player_pos[0] + dx, self.player_pos[1])
@@ -202,15 +209,23 @@ class Scene:
         self._update_hint()
 
     def move_forward(self, step: float = 2.0) -> None:
+        if self._is_dialog_active():  # NEW
+            return
         self._move(0, -step)
 
     def move_back(self, step: float = 2.0) -> None:
+        if self._is_dialog_active():  # NEW
+            return
         self._move(0, step)
 
     def move_left(self, step: float = 2.0) -> None:
+        if self._is_dialog_active():  # NEW
+            return
         self._move(-step, 0)
 
     def move_right(self, step: float = 2.0) -> None:
+        if self._is_dialog_active():  # NEW
+            return
         self._move(step, 0)
 
     # ---------- Диалоги ----------
