@@ -12,7 +12,6 @@ Vec2 = Tuple[float, float]
 
 @dataclass
 class Rect:
-    """Осе-выравненный прямоугольник. Координаты: левый-верхний (x1,y1) и правый-нижний (x2,y2)."""
     x1: float
     y1: float
     x2: float
@@ -38,7 +37,6 @@ class Rect:
 
 
 def distance_point_to_rect(px: float, py: float, r: Rect) -> float:
-    """Минимальная дистанция от точки до прямоугольника (0, если внутри/на границе)."""
     dx = max(r.x1 - px, 0, px - r.x2)
     dy = max(r.y1 - py, 0, py - r.y2)
     return math.hypot(dx, dy)
@@ -50,10 +48,8 @@ def distance_point_to_rect(px: float, py: float, r: Rect) -> float:
 
 Mode = Literal["hidden", "hint", "dialog"]
 
-
 @dataclass
 class TextWindow:
-    """Универсальное текстовое окно: подсказка для взаимодействия или диалог."""
     mode: Mode = "hidden"
     text: str = ""
     source_object_id: Optional[str] = None
@@ -80,17 +76,8 @@ class TextWindow:
 
 SceneFactory = Callable[[], "Scene"]
 
-
 @dataclass
 class GameObject:
-    """
-    Базовый объект сцены.
-    - rect: границы объекта (хранит левый-верхний и правый-нижний углы).
-    - solid: непроходимый?
-    - interactable: можно ли взаимодействовать?
-    - next_scene_factory: фабрика следующей сцены, если взаимодействие должно переключить сцену.
-    - name/sprite_id: полезно для отрисовки/отладки.
-    """
     id: str
     rect: Rect
     solid: bool = False
@@ -100,7 +87,6 @@ class GameObject:
     sprite_id: Optional[str] = None
 
     def on_interact(self, scene: "Scene") -> Optional["Scene"]:
-        """Базовое действие при взаимодействии: просто переключить сцену (если задана)."""
         if self.next_scene_factory:
             return self.next_scene_factory()
         return None
@@ -108,12 +94,17 @@ class GameObject:
 
 @dataclass
 class NPC(GameObject):
-    """NPC с диалогом. По завершении диалога может переключить сцену."""
     dialog_lines: List[str] = field(default_factory=list)
     _dialog_index: int = 0
+    # Новые поля:
+    repeatable: bool = False          # если False — после конца диалога NPC перестаёт быть интерактивным
+    persist_progress: bool = True     # если True — прогресс сохраняется между подходами
 
     def has_dialog(self) -> bool:
         return len(self.dialog_lines) > 0
+
+    def is_dialog_finished(self) -> bool:
+        return self._dialog_index >= len(self.dialog_lines)
 
     def reset_dialog(self) -> None:
         self._dialog_index = 0
@@ -125,20 +116,23 @@ class NPC(GameObject):
             return line
         return None
 
+    def on_dialog_finished(self) -> None:
+        """
+        Вызывается в момент, когда последняя реплика показана.
+        Если диалог не повторяемый — отключаем интерактивность.
+        """
+        if not self.repeatable:
+            self.interactable = False
+
     def on_interact(self, scene: "Scene") -> Optional["Scene"]:
-        """
-        Для NPC взаимодействие управляется сценой (пошаговая выдача реплик).
-        Возврат сцены здесь происходит только, если диалог уже завершён
-        и у NPC задан next_scene_factory.
-        """
-        if self._dialog_index >= len(self.dialog_lines) and self.next_scene_factory:
+        # После завершения диалога — возможно переключение сцены
+        if self.is_dialog_finished() and self.next_scene_factory:
             return self.next_scene_factory()
         return None
 
 
 @dataclass
 class StaticObject(GameObject):
-    """Статичный объект. Может быть проходимым/непроходимым и (опционально) интерактивным."""
     pass
 
 
@@ -148,14 +142,6 @@ class StaticObject(GameObject):
 
 @dataclass
 class Scene:
-    """
-    Сцена содержит:
-    - список объектов;
-    - позицию игрока (x, y) — левый-верхний угол хитбокса игрока;
-    - размер хитбокса игрока (player_size);
-    - текстовое окно (подсказки/диалог);
-    - радиус взаимодействия (interact_distance).
-    """
     id: str
     objects: List[GameObject]
     player_pos: Vec2
@@ -163,10 +149,9 @@ class Scene:
     text_window: TextWindow = field(default_factory=TextWindow)
     interact_distance: float = 24.0
 
-    # Техническое: текущий NPC, с которым идёт диалог
     _active_dialog_npc_id: Optional[str] = None
 
-    # ---------- Вспомогательные методы ----------
+    # ---------- Вспомогательные ----------
 
     def _player_rect(self, pos: Optional[Vec2] = None) -> Rect:
         x, y = pos if pos else self.player_pos
@@ -174,16 +159,12 @@ class Scene:
         return Rect(x, y, x + w, y + h)
 
     def _collides_with_solid(self, rect: Rect) -> bool:
-        for obj in self.objects:
-            if obj.solid and obj.rect.intersects(rect):
-                return True
-        return False
+        return any(o.solid and o.rect.intersects(rect) for o in self.objects)
 
     def _player_center(self) -> Vec2:
         return self._player_rect().center()
 
     def _nearest_interactable(self) -> Tuple[Optional[GameObject], float]:
-        """Возвращает (объект, расстояние) для ближайшего интерактивного объекта."""
         px, py = self._player_center()
         best_obj = None
         best_dist = float("inf")
@@ -197,9 +178,9 @@ class Scene:
         return best_obj, best_dist
 
     def _update_hint(self) -> None:
-        """Обновляет подсказку в текстовом окне, если рядом интерактивный объект и нет активного диалога."""
+        # В ходе активного диалога подсказки не показываем
         if self._active_dialog_npc_id is not None:
-            return  # в диалоге подсказки не показываем
+            return
         obj, dist = self._nearest_interactable()
         if obj and dist <= self.interact_distance:
             self.text_window.show_hint("Нажмите E, чтобы взаимодействовать", obj.id)
@@ -207,29 +188,23 @@ class Scene:
             if self.text_window.mode == "hint":
                 self.text_window.hide()
 
-    # ---------- Перемещение игрока ----------
+    # ---------- Перемещение ----------
 
     def _move(self, dx: float, dy: float) -> None:
-        """Перемещает игрока с поосевым разбором коллизий."""
-        # Ось X
         new_rect_x = self._player_rect().moved(dx, 0)
         if not self._collides_with_solid(new_rect_x):
             self.player_pos = (self.player_pos[0] + dx, self.player_pos[1])
 
-        # Ось Y
         new_rect_y = self._player_rect().moved(0, dy)
         if not self._collides_with_solid(new_rect_y):
             self.player_pos = (self.player_pos[0], self.player_pos[1] + dy)
 
-        # После движения — обновить подсказку
         self._update_hint()
 
     def move_forward(self, step: float = 2.0) -> None:
-        """Вперёд (вверх по экрану, уменьшение Y)."""
         self._move(0, -step)
 
     def move_back(self, step: float = 2.0) -> None:
-        """Назад (вниз по экрану, увеличение Y)."""
         self._move(0, step)
 
     def move_left(self, step: float = 2.0) -> None:
@@ -238,64 +213,88 @@ class Scene:
     def move_right(self, step: float = 2.0) -> None:
         self._move(step, 0)
 
-    # ---------- Взаимодействие ----------
+    # ---------- Диалоги ----------
+
+    def start_dialog_with(self, npc: NPC) -> None:
+        """
+        Начать (или продолжить) диалог с NPC.
+        - Если persist_progress=True и диалог уже начат, продолжим с текущего индекса.
+        - Если persist_progress=False, каждый раз начинаем сначала.
+        """
+        if not npc.has_dialog():
+            return
+
+        if not npc.persist_progress or npc.is_dialog_finished():
+            npc.reset_dialog()
+
+        self._active_dialog_npc_id = npc.id
+        # Показать первую/текущую реплику
+        line = npc.next_dialog_line()
+        if line is not None:
+            self.text_window.show_dialog(line, npc.id)
+        else:
+            # нет строк — ничего не показываем
+            self._active_dialog_npc_id = None
+            self.text_window.hide()
+
+    def next_dialog_step(self) -> Optional["Scene"]:
+        """
+        Переход к следующей реплике активного диалога.
+        Когда реплики заканчиваются — скрыть окно, завершить диалог, при необходимости
+        отключить NPC и потенциально переключить сцену.
+        """
+        if self._active_dialog_npc_id is None:
+            return None
+
+        npc = next((o for o in self.objects if isinstance(o, NPC) and o.id == self._active_dialog_npc_id), None)
+        if npc is None:
+            # NPC исчез — завершить
+            self._active_dialog_npc_id = None
+            self.text_window.hide()
+            return None
+
+        line = npc.next_dialog_line()
+        if line is not None:
+            self.text_window.show_dialog(line, npc.id)
+            return None
+
+        # Диалог завершён
+        npc.on_dialog_finished()
+        self._active_dialog_npc_id = None
+        self.text_window.hide()
+        # Возможная смена сцены
+        return npc.on_interact(self)
+
+    # ---------- Взаимодействие (E) ----------
 
     def unteract(self) -> Optional["Scene"]:
         """
-        Взаимодействие с ближайшим объектом, если он в пределах interact_distance.
-        Возвращает новую сцену, если объект инициирует её смену. Иначе — None.
+        Если сейчас идёт диалог — показать следующую реплику.
+        Иначе — начать диалог с ближайшим NPC или выполнить on_interact() у другого объекта.
         """
-        # Если уже идёт диалог — продвигаем его
+        # Продолжаем текущий диалог, если он активен
         if self._active_dialog_npc_id is not None:
-            npc = next((o for o in self.objects
-                        if isinstance(o, NPC) and o.id == self._active_dialog_npc_id), None)
-            if npc is None:
-                # NPC исчез/заменён — завершим диалог
-                self._active_dialog_npc_id = None
-                self.text_window.hide()
-                return None
+            return self.next_dialog_step()
 
-            line = npc.next_dialog_line()
-            if line is not None:
-                self.text_window.show_dialog(line, npc.id)
-                return None
-            else:
-                # диалог кончился
-                self._active_dialog_npc_id = None
-                self.text_window.hide()
-                # возможно переключение сцены после диалога
-                return npc.on_interact(self)
-
-        # Иначе — ищем ближайший интерактивный объект
+        # Ищем ближайший интерактивный объект
         obj, dist = self._nearest_interactable()
         if obj is None or dist > self.interact_distance:
             return None
 
-        # Если это NPC с диалогом — запускаем/показываем первую реплику
-        if isinstance(obj, NPC) and obj.has_dialog():
-            obj.reset_dialog()
-            first = obj.next_dialog_line()
-            if first is not None:
-                self._active_dialog_npc_id = obj.id
-                self.text_window.show_dialog(first, obj.id)
-                return None
-            # если диалог пуст — пробуем стандартное поведение
-        # Для прочих объектов — стандартное поведение
+        # Диалог с NPC
+        if isinstance(obj, NPC) and obj.has_dialog() and (not obj.is_dialog_finished() or obj.repeatable):
+            self.start_dialog_with(obj)
+            return None
+
+        # Обычный интерактив
         return obj.on_interact(self)
 
-    # Удобный алиас (если вдруг опечатка не нужна)
     def interact(self) -> Optional["Scene"]:
         return self.unteract()
 
     # ---------- Данные для рендера ----------
 
     def get_draw_data(self) -> dict:
-        """
-        Минимальный пакет данных для рендера (можно адаптировать под ваш движок/pygame):
-        - player_rect: хитбокс игрока
-        - objects: список объектов с rect и sprite_id
-        - ui: состояние текстового окна
-        """
         return {
             "player_rect": self._player_rect(),
             "objects": [
@@ -307,6 +306,9 @@ class Scene:
                     "solid": o.solid,
                     "interactable": o.interactable,
                     "type": "NPC" if isinstance(o, NPC) else "Static",
+                    # Немного отладочной инфы по диалогу
+                    "dialog_index": getattr(o, "_dialog_index", None) if isinstance(o, NPC) else None,
+                    "dialog_len": len(o.dialog_lines) if isinstance(o, NPC) else None,
                 }
                 for o in self.objects
             ],
@@ -314,88 +316,6 @@ class Scene:
                 "mode": self.text_window.mode,
                 "text": self.text_window.text,
                 "source_object_id": self.text_window.source_object_id,
+                "dialog_active_with": self._active_dialog_npc_id,
             },
         }
-
-#
-# # ==========================
-# # Пример использования
-# # ==========================
-#
-# def make_scene_b() -> Scene:
-#     # Пустая сцена B
-#     return Scene(
-#         id="scene_b",
-#         objects=[],
-#         player_pos=(20, 20),
-#         player_size=(16, 16)
-#     )
-#
-#
-# def make_scene_a() -> Scene:
-#     door = StaticObject(
-#         id="door_1",
-#         name="Дверь в сцену B",
-#         rect=Rect(120, 40, 140, 72),
-#         solid=False,
-#         interactable=True,
-#         next_scene_factory=make_scene_b,
-#         sprite_id="spr_door"
-#     )
-#
-#     wall = StaticObject(
-#         id="wall_1",
-#         name="Стена",
-#         rect=Rect(0, 0, 200, 16),
-#         solid=True,
-#         interactable=False,
-#         sprite_id="spr_wall"
-#     )
-#
-#     granny = NPC(
-#         id="npc_granny",
-#         name="Әби",
-#         rect=Rect(60, 60, 76, 92),
-#         solid=False,
-#         interactable=True,
-#         dialog_lines=["Сәлам!", "Ярый, бар, сөйләшик соңрак."],
-#         sprite_id="spr_granny"
-#     )
-#
-#     return Scene(
-#         id="scene_a",
-#         objects=[door, wall, granny],
-#         player_pos=(30, 90),
-#         player_size=(16, 16),
-#         interact_distance=28.0
-#     )
-#
-#
-# if __name__ == "__main__":
-#     # Небольшая проверка логики без графики
-#     scene = make_scene_a()
-#
-#     # Движение к двери
-#     scene.move_right(100)
-#     scene.move_back(0)  # подсказка обновится автоматически
-#     print("UI hint:", scene.text_window.mode, scene.text_window.text)
-#
-#     # Взаимодействуем (должно переключить сцену)
-#     new_scene = scene.unteract()
-#     if new_scene:
-#         scene = new_scene
-#         print("Переключились на сцену:", scene.id)
-#
-#     # Движение к NPC (в примере NPC был в первой сцене, это просто демонстрация)
-#     scene = make_scene_a()
-#     scene.player_pos = (50, 80)
-#     scene._update_hint()
-#     print("UI hint near NPC:", scene.text_window.mode, scene.text_window.text)
-#
-#     # Диалог по шагам
-#     scene.unteract()  # первая реплика
-#     print("Dialog 1:", scene.text_window.text)
-#     scene.unteract()  # вторая реплика
-#     print("Dialog 2:", scene.text_window.text)
-#     scene.unteract()  # диалог завершён
-#     print("Dialog ended. UI:", scene.text_window.mode)
