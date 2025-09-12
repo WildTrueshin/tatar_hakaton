@@ -46,4 +46,32 @@ class Scene:
                 return
         self.go(tuple({0, -DELTA}))
 
-    def
+    def backward(self):
+        newcord = self.cord
+        newcord[1] += DELTA
+        for obj in self.objects:
+            x1, y1 = obj.cordL
+            x2, y2 = obj.cordR
+            if x1 <= newcord[0] <= x2 and y1 <= newcord[1] <= y2:
+                return
+        self.go(tuple({0, +DELTA}))
+
+    def right(self):
+        newcord = self.cord
+        newcord[0] += DELTA
+        for obj in self.objects:
+            x1, y1 = obj.cordL
+            x2, y2 = obj.cordR
+            if x1 <= newcord[0] <= x2 and y1 <= newcord[1] <= y2:
+                return
+        self.go(tuple({+DELTA, 0}))
+
+    def left(self):
+        newcord = self.cord
+        newcord[0] -= DELTA
+        for obj in self.objects:
+            x1, y1 = obj.cordL
+            x2, y2 = obj.cordR
+            if x1 <= newcord[0] <= x2 and y1 <= newcord[1] <= y2:
+                return
+        self.go(tuple({-DELTA, 0}))
