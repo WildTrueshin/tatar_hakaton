@@ -10,7 +10,7 @@ pygame.init()
 info = pygame.display.Info()
 HEIGHT = info.current_h
 WIDTH = int(HEIGHT * 16 / 9)
-SCALE = HEIGHT / 1000
+SCALE = HEIGHT / 300
 FPS = 30
 DIALOG_COLOR = (246, 235, 165)
 TEXT_COLOR = (41, 43, 51)

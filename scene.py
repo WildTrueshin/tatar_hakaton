@@ -48,6 +48,7 @@ def distance_point_to_rect(px: float, py: float, r: Rect) -> float:
 
 Mode = Literal["hidden", "hint", "dialog"]
 
+
 @dataclass
 class TextWindow:
     mode: Mode = "hidden"
@@ -75,6 +76,7 @@ class TextWindow:
 # ==========================
 
 SceneFactory = Callable[[], "Scene"]
+
 
 @dataclass
 class GameObject:
@@ -155,7 +157,7 @@ class Scene:
     player_size: Vec2 = (16, 16)
     text_window: TextWindow = field(default_factory=TextWindow)
     interact_distance: float = 24.0
-
+    texture_path_to_player: str = "sprites/bahtiyar"
     # Путь к текстуре игрока:
     player_texture_path: Optional[str] = None
     # Масштабировать ли текстуру игрока под размер хитбокса:
@@ -224,21 +226,25 @@ class Scene:
         if self._is_dialog_active():
             return
         self._move(0, -step)
+        self.player_texture_path = self.texture_path_to_player + "/back.png"
 
     def move_back(self, step: float = 2.0) -> None:
         if self._is_dialog_active():
             return
         self._move(0, step)
+        self.player_texture_path = self.texture_path_to_player + "/front.png"
 
     def move_left(self, step: float = 2.0) -> None:
         if self._is_dialog_active():
             return
         self._move(-step, 0)
+        self.player_texture_path = self.texture_path_to_player + "/left.png"
 
-    def move_right(self, step: float = 2.0) -> None:
+    def move_right(self,step: float = 2.0) -> None:
         if self._is_dialog_active():
             return
         self._move(step, 0)
+        self.player_texture_path = self.texture_path_to_player + "/right.png"
 
     # ---------- Диалоги ----------
 
@@ -330,4 +336,3 @@ class Scene:
 
     def get_name(self):
         return self.id
-
