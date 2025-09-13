@@ -168,7 +168,7 @@ class Scene:
     # Масштабировать ли текстуру игрока под размер хитбокса:
     scale_player_texture_to_rect: bool = True
     # Порядок отрисовки игрока:
-    player_z: int = 10
+    player_z: int = 0
 
     _active_dialog_npc_id: Optional[str] = None
 

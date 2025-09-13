@@ -27,7 +27,7 @@ def home_scene() -> Scene:
         repeatable=False,
         persist_progress=True,
         texture_path="sprites/objects/grandma.png",
-        z=2,
+        z=0,
     )
     return Scene(
         id="home_scene",
@@ -35,6 +35,7 @@ def home_scene() -> Scene:
         player_pos=(20, 20),
         player_size=(120, 120),
         player_texture_path=f"sprites/bahtiyar/down{0}.png",
+        player_z=0
     )
 
 
@@ -56,7 +57,7 @@ def make_scene_a() -> Scene:
         interactable=True,
         next_scene_factory=home_scene,
         texture_path="sprites/objects/house1.png",
-        z=1,
+        z=0,
     )
 
     wall = StaticObject(
@@ -76,7 +77,7 @@ def make_scene_a() -> Scene:
         interact_distance=28.0,
         player_texture_path=f"sprites/bahtiyar/down{0}.png",
         scale_player_texture_to_rect=True,
-        player_z=10,
+        player_z=0,
     )
 
 
