@@ -97,6 +97,8 @@ class GameObject:
     name: Optional[str] = None
 
     texture_path: Optional[str] = None
+    l: int = 0
+
     z: int = 0
     # Если True — текстуру масштабировать под rect при отрисовке.
     scale_texture_to_rect: bool = True
@@ -158,6 +160,9 @@ class Scene:
     text_window: TextWindow = field(default_factory=TextWindow)
     interact_distance: float = 24.0
     texture_path_to_player: str = "sprites/bahtiyar"
+    l: int = 0
+    c: int = 0
+    player_speed: int = 5
     # Путь к текстуре игрока:
     player_texture_path: Optional[str] = None
     # Масштабировать ли текстуру игрока под размер хитбокса:
@@ -226,25 +231,37 @@ class Scene:
         if self._is_dialog_active():
             return
         self._move(0, -step)
-        self.player_texture_path = self.texture_path_to_player + "/back.png"
+        self.l += (self.c % self.player_speed) == 0
+        self.l %= 5
+        self.c += 1
+        self.player_texture_path = self.texture_path_to_player + f'/up{self.l % 5}.png'
 
     def move_back(self, step: float = 2.0) -> None:
         if self._is_dialog_active():
             return
         self._move(0, step)
-        self.player_texture_path = self.texture_path_to_player + "/front.png"
+        self.l += (self.c % self.player_speed) == 0
+        self.l %= 5
+        self.c += 1
+        self.player_texture_path = self.texture_path_to_player + f'/down{self.l}.png'
 
     def move_left(self, step: float = 2.0) -> None:
         if self._is_dialog_active():
             return
         self._move(-step, 0)
-        self.player_texture_path = self.texture_path_to_player + "/left.png"
+        self.l += (self.c % self.player_speed) == 0
+        self.l %= 5
+        self.c += 1
+        self.player_texture_path = self.texture_path_to_player + f'/left{self.l}.png'
 
     def move_right(self,step: float = 2.0) -> None:
         if self._is_dialog_active():
             return
         self._move(step, 0)
-        self.player_texture_path = self.texture_path_to_player + "/right.png"
+        self.l += (self.c % self.player_speed) == 0
+        self.l %= 5
+        self.c += 1
+        self.player_texture_path = self.texture_path_to_player + f'/right{self.l}.png'
 
     # ---------- Диалоги ----------
 

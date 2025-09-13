@@ -34,7 +34,7 @@ def home_scene() -> Scene:
         objects=[field, granny],
         player_pos=(20, 20),
         player_size=(120, 120),
-        player_texture_path="sprites/bahtiyar/front.png",
+        player_texture_path=f"sprites/bahtiyar/down{0}.png",
     )
 
 
@@ -74,7 +74,7 @@ def make_scene_a() -> Scene:
         player_pos=(30, 90),
         player_size=(16, 16),
         interact_distance=28.0,
-        player_texture_path="sprites/bahtiyar/front.png",
+        player_texture_path=f"sprites/bahtiyar/down{0}.png",
         scale_player_texture_to_rect=True,
         player_z=10,
     )
