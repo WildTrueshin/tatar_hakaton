@@ -131,7 +131,7 @@ while running:
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             current_scene.move_right()
 
-    pygame.display.flip()
+    pygame.display.update()
     clock.tick(FPS)
 
 pygame.quit()
