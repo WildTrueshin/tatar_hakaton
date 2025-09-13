@@ -14,7 +14,7 @@ def home_scene() -> Scene:
         solid=False,
         interactable=False,
         texture_path="sprites/backgrounds/home.png",
-        z=-1,
+        z=0,
         scale_texture_to_rect=True,
     )
     granny = NPC(
@@ -32,16 +32,16 @@ def home_scene() -> Scene:
         repeatable=False,
         persist_progress=True,
         texture_path="sprites/objects/grandma.png",
-        z=0,
+        z=1,
     )
     door = StaticObject(
         id="home_scene",
-        rect=Rect(20, 20, 120, 220),
+        rect=Rect(33, 21, 151, 166),
         solid=False,
         interactable=True,
         next_scene_factory=root_scene,
         texture_path="sprites/objects/house1.png",
-        z=0,
+        z=-1,
     )
 
     home_b = True
@@ -51,7 +51,7 @@ def home_scene() -> Scene:
         player_pos=(20, 20),
         player_size=(120, 120),
         player_texture_path=f"sprites/bahtiyar/down{0}.png",
-        player_z=0
+        player_z=1
     )
 
 
@@ -76,7 +76,7 @@ def root_scene() -> Scene:
         interactable=True,
         next_scene_factory=home_scene,
         texture_path="sprites/objects/house1.png",
-        z=0,
+        z=1,
     )
 
     block_line = StaticObject(
@@ -94,7 +94,7 @@ def root_scene() -> Scene:
         solid=True,
         interactable=False,
         texture_path="sprites/objects/house1.png",
-        z=0,
+        z=1,
         scale_texture_to_rect=True,
     )
     root_b = True
@@ -106,7 +106,7 @@ def root_scene() -> Scene:
         interact_distance=28.0,
         player_texture_path=f"sprites/bahtiyar/down{0}.png",
         scale_player_texture_to_rect=True,
-        player_z=0,
+        player_z=2,
     )
 
 

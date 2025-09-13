@@ -26,7 +26,7 @@ E_SPRITE = pygame.transform.scale(E_SPRITE, (E_SIZE, E_SIZE))
 E_RECT = pygame.Rect(0, 0, E_SIZE, E_SIZE)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
-pygame.display.set_caption("Checheck game")
+pygame.display.set_caption("Чәчәк Quest")
 clock = pygame.time.Clock()
 
 data = load_game()
