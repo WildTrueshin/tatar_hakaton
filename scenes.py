@@ -1,7 +1,12 @@
 from scene import *
-from data_helper import *
+
+home_b = root_b = False
+
 
 def home_scene() -> Scene:
+    global home_b
+    if home_b:
+        return scenes["home_scene"]
     field = StaticObject(
         id='field',
         name='Поле',
@@ -9,13 +14,13 @@ def home_scene() -> Scene:
         solid=False,
         interactable=False,
         texture_path="sprites/backgrounds/home.png",
-        z=-1,
+        z=0,
         scale_texture_to_rect=True,
     )
     granny = NPC(
         id="npc_granny",
         name="Әби",
-        rect=Rect(110, 160, 200, 250),
+        rect=Rect(110, 130, 200, 250),
         solid=False,
         interactable=True,
         dialog_lines=[
@@ -27,19 +32,32 @@ def home_scene() -> Scene:
         repeatable=False,
         persist_progress=True,
         texture_path="sprites/objects/grandma.png",
-        z=0,
+        z=1,
     )
+    door = StaticObject(
+        id="home_scene",
+        rect=Rect(33, 21, 151, 166),
+        solid=False,
+        interactable=True,
+        next_scene_factory=root_scene,
+        texture_path="sprites/objects/house1.png",
+        z=-1,
+    )
+    home_b = True
     return Scene(
         id="home_scene",
-        objects=[field, granny],
+        objects=[field, granny, door],
         player_pos=(20, 20),
         player_size=(120, 120),
         player_texture_path=f"sprites/bahtiyar/down{0}.png",
-        player_z=0
+        player_z=1
     )
 
 
-def make_scene_a() -> Scene:
+def root_scene() -> Scene:
+    global root_b
+    if root_b:
+        return scenes["root_scene"]
     field = StaticObject(
         id='field',
         name='Поле',
@@ -47,7 +65,7 @@ def make_scene_a() -> Scene:
         solid=False,
         interactable=False,
         texture_path="sprites/backgrounds/root.png",
-        z=-1,
+        z=0,
         scale_texture_to_rect=True,
     )
     door = StaticObject(
@@ -57,7 +75,16 @@ def make_scene_a() -> Scene:
         interactable=True,
         next_scene_factory=home_scene,
         texture_path="sprites/objects/house1.png",
-        z=0,
+        z=1,
+    )
+
+    block_line = StaticObject(
+        id="block_line",
+        rect=Rect(205, 125, 245, 140),
+        solid=True,
+        interactable=False,
+        texture_path="sprites/bahtiyar/down0.png",
+        z=-1,
     )
 
     wall = StaticObject(
@@ -66,22 +93,23 @@ def make_scene_a() -> Scene:
         solid=True,
         interactable=False,
         texture_path="sprites/objects/house1.png",
-        z=0,
+        z=1,
         scale_texture_to_rect=True,
     )
+    root_b = True
     return Scene(
-        id="scene_a",
-        objects=[field, door, wall],
+        id="root_scene",
+        objects=[field, door, wall, block_line],
         player_pos=(30, 90),
         player_size=(16, 16),
         interact_distance=28.0,
         player_texture_path=f"sprites/bahtiyar/down{0}.png",
         scale_player_texture_to_rect=True,
-        player_z=0,
+        player_z=1,
     )
 
 
 scenes = {
-    "scene_a": make_scene_a(),
-    "home_scene": home_scene(),
+    "root_scene": root_scene(),
+    "home_scene": home_scene()
 }
