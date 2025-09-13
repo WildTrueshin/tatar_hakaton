@@ -5,7 +5,7 @@ import sys
 import scenes
 from scene import Scene
 from data_helper import *
-from scenes import root_scene
+from scenes import scene1
 
 pygame.init()
 
@@ -49,16 +49,45 @@ def draw_inventory(items):
         screen.blit(sprite, (x, y))
         text_surface = DIALOG_FONT.render(word, True, TEXT_COLOR)
         text_rect = text_surface.get_rect(center=(x + item_size // 2, y + item_size + font_h // 2))
-        screen.blit(text_surface, text_rect) screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
+        screen.blit(text_surface, text_rect)
+
+
+def draw_dialog(text, items):
+    """Отрисовать диалог с картинками под словами из словаря."""
+    dialog_rect = pygame.Rect(0, HEIGHT - DIALOG_HEIGHT, WIDTH, DIALOG_HEIGHT)
+    pygame.draw.rect(screen, DIALOG_COLOR, dialog_rect, border_radius=20)
+    pygame.draw.rect(screen, BORDER_COLOR, dialog_rect, border_radius=20, width=BORDER_WIDTH)
+
+    words = text.split()
+    space_w = DIALOG_FONT.size(" ")[0]
+    surfaces = [DIALOG_FONT.render(w, True, TEXT_COLOR) for w in words]
+    total_w = sum(s.get_width() for s in surfaces) + space_w * max(0, len(surfaces) - 1)
+    x = (WIDTH - total_w) // 2
+    y_text = dialog_rect.y + (DIALOG_HEIGHT - DIALOG_FONT.get_height()) // 2
+
+    inventory_map = {item["word"].lower(): item["texture_path"] for item in items}
+    for w, surf in zip(words, surfaces):
+        screen.blit(surf, (x, y_text))
+        clean = w.strip(".,!?;:\"'").lower()
+        if clean in inventory_map:
+            img = pygame.image.load(inventory_map[clean]).convert_alpha()
+            img_size = DIALOG_FONT.get_height()
+            img = pygame.transform.scale(img, (img_size, img_size))
+            img_rect = img.get_rect(center=(x + surf.get_width() // 2, y_text + surf.get_height() + img_size // 2 + 5))
+            screen.blit(img, img_rect)
+        x += surf.get_width() + space_w
+
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
 pygame.display.set_caption("Checheck game")
 clock = pygame.time.Clock()
 
 data = load_game()
 print(data)
-if "scene" not in data.keys():
-    current_scene: Scene = root_scene()
-else:
-    current_scene: Scene = scenes.scenes[data["scene"]]
+#if "scene" not in data.keys():
+current_scene: Scene = scene1()
+#else:
+#    current_scene: Scene = scenes.scenes[data["scene"]]
 
 
 def cmp_objects(obj1, obj2):
@@ -87,38 +116,9 @@ while running:
             if event.key == pygame.K_q:
                 current_scene.toggle_inventory()
 
-    screen.fill((0, 0, 0))
-    scene_info = current_scene.get_draw_data()
-
-    sorted_objects = scene_info["objects"]
-    sorted_objects.append(scene_info["player"])
-    sorted_objects.sort(key=cmp_to_key(cmp_objects))
-
-    for obj in sorted_objects:
-        rect = obj["rect"]
-        x_l = rect.x1 * SCALE
-        y_t = rect.y1 * SCALE
-        width = (rect.x2 - rect.x1) * SCALE
-        height = (rect.y2 - rect.y1) * SCALE
-
-        sprite = pygame.image.load(obj["texture_path"]).convert_alpha()
-        sprite = pygame.transform.scale(sprite, (width, height))
-        rect = sprite.get_rect(topleft=(x_l, y_t))
-        screen.blit(sprite, rect)
-
-    if scene_info["inventory"]["open"]:
-        draw_inventory(scene_info["inventory"]["items"])
-    elif scene_info["ui"]["mode"] == "dialog":
-        dialog_rect = pygame.Rect(0, HEIGHT - DIALOG_HEIGHT, WIDTH, DIALOG_HEIGHT)
-        pygame.draw.rect(screen, DIALOG_COLOR, dialog_rect, border_radius=20)
-        pygame.draw.rect(screen, BORDER_COLOR, dialog_rect, border_radius=20, width=BORDER_WIDTH)
-        text_surface = DIALOG_FONT.render(scene_info["ui"]["text"], True, TEXT_COLOR)
-        text_rect = text_surface.get_rect(center=dialog_rect.center)
-        screen.blit(text_surface, text_rect)
-    else:
-        if scene_info["ui"]["mode"] == "hint":
-            screen.blit(E_SPRITE, E_RECT)
-        keys = pygame.key.get_pressed()
+    # обновляем позицию игрока до отрисовки
+    keys = pygame.key.get_pressed()
+    if not current_scene.inventory_open and current_scene.text_window.mode != "dialog":
         if keys[pygame.K_w] or keys[pygame.K_UP]:
             current_scene.move_forward()
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
@@ -127,6 +127,33 @@ while running:
             current_scene.move_left()
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             current_scene.move_right()
+
+    scene_info = current_scene.get_draw_data()
+    screen.fill((0, 0, 0))
+
+    sorted_objects = scene_info["objects"] + [scene_info["player"]]
+    sorted_objects.sort(key=cmp_to_key(cmp_objects))
+
+    for obj in sorted_objects:
+        rect = obj["rect"]
+        x_l = int(rect.x1 * SCALE)
+        y_t = int(rect.y1 * SCALE)
+        width = int((rect.x2 - rect.x1) * SCALE)
+        height = int((rect.y2 - rect.y1) * SCALE)
+    
+        if (obj["texture_path"] is not None):
+            sprite = pygame.image.load(obj["texture_path"]).convert_alpha()
+            sprite = pygame.transform.scale(sprite, (width, height))
+            rect = sprite.get_rect(topleft=(x_l, y_t))
+            screen.blit(sprite, rect)
+
+    if scene_info["inventory"]["open"]:
+        draw_inventory(scene_info["inventory"]["items"])
+    elif scene_info["ui"]["mode"] == "dialog":
+        draw_dialog(scene_info["ui"]["text"], scene_info["inventory"]["items"])
+    else:
+        if scene_info["ui"]["mode"] == "hint":
+            screen.blit(E_SPRITE, E_RECT)
 
     pygame.display.flip()
     clock.tick(FPS)

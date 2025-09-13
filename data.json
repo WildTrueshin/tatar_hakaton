@@ -1,4 +1,17 @@
 {
-    "inventory": [],
-    "scene": "root_scene"
+    "inventory": [
+        {
+            "word": "\u0431\u0430\u0431\u0430\u0439",
+            "texture_path": "sprites/objects/grandpa.png"
+        },
+        {
+            "word": "\u04d9\u0431\u0438",
+            "texture_path": "sprites/objects/grandma.png"
+        },
+        {
+            "word": "\u0447\u04d9\u0447\u04d9\u043a",
+            "texture_path": "sprites/objects/flower.png"
+        }
+    ],
+    "scene": "scene9"
 }
