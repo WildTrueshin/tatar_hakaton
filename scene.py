@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, List, Optional, Tuple, Literal
+from data_helper import add_inventory_item, load_inventory
 import math
 
 Vec2 = Tuple[float, float]
@@ -169,6 +170,10 @@ class Scene:
     scale_player_texture_to_rect: bool = True
     # Порядок отрисовки игрока:
     player_z: int = 0
+      
+      
+    # Открыт ли сейчас инвентарь
+    inventory_open: bool = False
 
     _active_dialog_npc_id: Optional[str] = None
 
@@ -202,7 +207,7 @@ class Scene:
         return best_obj, best_dist
 
     def _update_hint(self) -> None:
-        if self._is_dialog_active():
+        if self._is_dialog_active() or self.inventory_open:
             return
         obj, dist = self._nearest_interactable()
         if obj and dist <= self.interact_distance:
@@ -214,7 +219,7 @@ class Scene:
     # ---------- Перемещение (заблокировано при диалоге) ----------
 
     def _move(self, dx: float, dy: float) -> None:
-        if self._is_dialog_active():
+        if self._is_dialog_active() or self.inventory_open:
             return
 
         new_rect_x = self._player_rect().moved(dx, 0)
@@ -228,7 +233,7 @@ class Scene:
         self._update_hint()
 
     def move_forward(self, step: float = 2.0) -> None:
-        if self._is_dialog_active():
+        if self._is_dialog_active() or self.inventory_open:
             return
         self._move(0, -step)
         self.l += (self.c % self.player_speed) == 0
@@ -237,7 +242,7 @@ class Scene:
         self.player_texture_path = self.texture_path_to_player + f'/up{self.l % 5}.png'
 
     def move_back(self, step: float = 2.0) -> None:
-        if self._is_dialog_active():
+        if self._is_dialog_active() or self.inventory_open:
             return
         self._move(0, step)
         self.l += (self.c % self.player_speed) == 0
@@ -246,7 +251,7 @@ class Scene:
         self.player_texture_path = self.texture_path_to_player + f'/down{self.l}.png'
 
     def move_left(self, step: float = 2.0) -> None:
-        if self._is_dialog_active():
+        if self._is_dialog_active() or self.inventory_open:
             return
         self._move(-step, 0)
         self.l += (self.c % self.player_speed) == 0
@@ -255,7 +260,7 @@ class Scene:
         self.player_texture_path = self.texture_path_to_player + f'/left{self.l}.png'
 
     def move_right(self,step: float = 2.0) -> None:
-        if self._is_dialog_active():
+        if self._is_dialog_active() or self.inventory_open:
             return
         self._move(step, 0)
         self.l += (self.c % self.player_speed) == 0
@@ -298,6 +303,8 @@ class Scene:
     # ---------- Взаимодействие (E) ----------
 
     def unteract(self) -> Optional["Scene"]:
+        if self.inventory_open:
+            return None
         if self._active_dialog_npc_id is not None:
             return self.next_dialog_step()
         obj, dist = self._nearest_interactable()
@@ -310,6 +317,25 @@ class Scene:
 
     def interact(self) -> Optional["Scene"]:
         return self.unteract()
+
+    # ---------- Инвентарь ----------
+
+    def add_element(self, element: Tuple[str, str]) -> None:
+        """Добавить элемент (слово, путь к картинке) в инвентарь."""
+        word, path = element
+        add_inventory_item(word, path)
+
+    def toggle_inventory(self) -> None:
+        """Открыть/закрыть инвентарь. Нельзя открыть во время диалога."""
+        if self._is_dialog_active():
+            return
+        self.inventory_open = not self.inventory_open
+        if self.inventory_open:
+            # Скрываем подсказки при открытии инвентаря
+            self.text_window.hide()
+        else:
+            # После закрытия обновляем подсказку
+            self._update_hint()
 
     # ---------- Данные для рендера (включая пути к текстурам) ----------
 
@@ -348,6 +374,10 @@ class Scene:
                 "text": self.text_window.text,
                 "source_object_id": self.text_window.source_object_id,
                 "dialog_active_with": self._active_dialog_npc_id,
+            },
+            "inventory": {
+                "open": self.inventory_open,
+                "items": load_inventory(),
             },
         }
 
