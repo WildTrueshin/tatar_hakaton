@@ -64,8 +64,6 @@ while running:
         rect = sprite.get_rect(topleft=(x_l, y_t))
         screen.blit(sprite, rect)
 
-    if scene_info["ui"]["mode"] == "hint":
-        screen.blit(E_SPRITE, E_RECT)
     if scene_info["ui"]["mode"] == "dialog":
         dialog_rect = pygame.Rect(0, HEIGHT - DIALOG_HEIGHT, WIDTH, DIALOG_HEIGHT)
         pygame.draw.rect(screen, DIALOG_COLOR, dialog_rect, border_radius=20)
@@ -73,7 +71,9 @@ while running:
         text_surface = DIALOG_FONT.render(scene_info["ui"]["text"], True, TEXT_COLOR)
         text_rect = text_surface.get_rect(center=dialog_rect.center)
         screen.blit(text_surface, text_rect)
-    elif scene_info["ui"]["mode"] == "hidden":
+    else:
+        if scene_info["ui"]["mode"] == "hint":
+            screen.blit(E_SPRITE, E_RECT)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w] or keys[pygame.K_UP]:
             current_scene.move_forward()
