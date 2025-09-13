@@ -43,7 +43,6 @@ def home_scene() -> Scene:
         texture_path="sprites/objects/house1.png",
         z=-1,
     )
-
     home_b = True
     return Scene(
         id="home_scene",
@@ -66,7 +65,7 @@ def root_scene() -> Scene:
         solid=False,
         interactable=False,
         texture_path="sprites/backgrounds/root.png",
-        z=-1,
+        z=0,
         scale_texture_to_rect=True,
     )
     door = StaticObject(
@@ -106,7 +105,7 @@ def root_scene() -> Scene:
         interact_distance=28.0,
         player_texture_path=f"sprites/bahtiyar/down{0}.png",
         scale_player_texture_to_rect=True,
-        player_z=2,
+        player_z=1,
     )
 
 
