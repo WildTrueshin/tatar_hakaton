@@ -71,7 +71,7 @@ def root_scene() -> Scene:
     door = StaticObject(
         id="home_root",
         rect=Rect(200, 100, 250, 150),
-        solid=True,
+        solid=False,
         interactable=True,
         next_scene_factory=home_scene,
         texture_path="sprites/objects/house1.png",
