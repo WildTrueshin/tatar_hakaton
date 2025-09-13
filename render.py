@@ -34,10 +34,13 @@ print(data)
 current_scene: Scene = scenes.scenes[data["scene"]]
 
 def cmp_objects(obj1, obj2):
-    if obj1["z"] != obj2["z"]:
-        return obj1["z"] < obj2["z"]
-
-    return obj1["rect"].y2 > obj2["rect"].y2
+    if obj1["z"] < obj2["z"]:
+        return -1
+    if obj1["z"] > obj2["z"]:
+        return 1
+    if obj1["rect"].y2 < obj2["rect"].y2:
+        return -1
+    return 1
 
 running = True
 while running:
