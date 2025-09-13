@@ -7,7 +7,4 @@ def load_game():
 
 def save_game(scene_name):
     with open("data.json", "w", encoding="utf-8") as f:
-
-        scene_name="menu"
-
         json.dump({"scene": scene_name}, f, indent=4)
