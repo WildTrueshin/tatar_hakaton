@@ -20,7 +20,7 @@ def home_scene() -> Scene:
     granny = NPC(
         id="npc_granny",
         name="Әби",
-        rect=Rect(110, 160, 200, 250),
+        rect=Rect(110, 130, 200, 250),
         solid=False,
         interactable=True,
         dialog_lines=[
