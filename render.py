@@ -49,11 +49,8 @@ def draw_inventory(items):
         screen.blit(sprite, (x, y))
         text_surface = DIALOG_FONT.render(word, True, TEXT_COLOR)
         text_rect = text_surface.get_rect(center=(x + item_size // 2, y + item_size + font_h // 2))
-        screen.blit(text_surface, text_rect)
-
-
-screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
-pygame.display.set_caption("Чәчәк Quest")
+        screen.blit(text_surface, text_rect) screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
+pygame.display.set_caption("Checheck game")
 clock = pygame.time.Clock()
 
 data = load_game()
@@ -61,7 +58,7 @@ print(data)
 if "scene" not in data.keys():
     current_scene: Scene = root_scene()
 else:
-    current_scene: Scene = scenes.SCENES[data["scene"]]
+    current_scene: Scene = scenes.scenes[data["scene"]]
 
 
 def cmp_objects(obj1, obj2):
@@ -131,7 +128,7 @@ while running:
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             current_scene.move_right()
 
-    pygame.display.update()
+    pygame.display.flip()
     clock.tick(FPS)
 
 pygame.quit()

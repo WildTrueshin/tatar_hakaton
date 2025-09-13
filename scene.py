@@ -5,7 +5,6 @@ from data_helper import add_inventory_item, load_inventory
 import math
 
 Vec2 = Tuple[float, float]
-from data_helper import SCENES
 
 
 # ==========================
@@ -98,7 +97,6 @@ class GameObject:
     next_scene_factory: Optional[SceneFactory] = None
     name: Optional[str] = None
 
-    reset_texture: Optional[list[tuple[str, str, str]]] = None  #
     texture_path: Optional[str] = None
     l: int = 0
 
@@ -133,12 +131,6 @@ class NPC(GameObject):
             line = self.dialog_lines[self._dialog_index]
             self._dialog_index += 1
             return line
-        global SCENES
-        for [sc_, obj_id, new_path] in self.reset_texture:
-            for obj in SCENES[sc_].objects:
-                if obj.id == obj_id:
-                    obj.texture_path = new_path
-                    obj.interactable = not obj.interactable
         return None
 
     def on_dialog_finished(self) -> None:
@@ -178,8 +170,8 @@ class Scene:
     scale_player_texture_to_rect: bool = True
     # Порядок отрисовки игрока:
     player_z: int = 0
-
-
+      
+      
     # Открыт ли сейчас инвентарь
     inventory_open: bool = False
 
