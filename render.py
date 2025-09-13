@@ -5,7 +5,6 @@ import sys
 import scenes
 from scene import Scene
 from data_helper import *
-from scenes import make_scene_a
 
 pygame.init()
 
@@ -25,42 +24,17 @@ E_PATH = "sprites/system/use_e.png"
 E_SPRITE = pygame.image.load(E_PATH)
 E_SPRITE = pygame.transform.scale(E_SPRITE, (E_SIZE, E_SIZE))
 E_RECT = pygame.Rect(0, 0, E_SIZE, E_SIZE)
-
-
-def draw_inventory(items):
-    """Отрисовка окна инвентаря."""
-    inv_rect = pygame.Rect(0, 0, WIDTH, HEIGHT)
-    pygame.draw.rect(screen, DIALOG_COLOR, inv_rect)
-    pygame.draw.rect(screen, BORDER_COLOR, inv_rect, width=BORDER_WIDTH)
-
-    item_size = int(HEIGHT / 6)
-    padding = int(item_size * 0.5)
-    font_h = DIALOG_FONT.get_height()
-    cols = max(1, (WIDTH - padding) // (item_size + padding))
-    for i, item in enumerate(items):
-        word = item["word"]
-        path = item["texture_path"]
-        sprite = pygame.image.load(path).convert_alpha()
-        sprite = pygame.transform.scale(sprite, (item_size, item_size))
-        col = i % cols
-        row = i // cols
-        x = padding + col * (item_size + padding)
-        y = padding + row * (item_size + font_h + padding)
-        screen.blit(sprite, (x, y))
-        text_surface = DIALOG_FONT.render(word, True, TEXT_COLOR)
-        text_rect = text_surface.get_rect(center=(x + item_size // 2, y + item_size + font_h // 2))
-        screen.blit(text_surface, text_rect)
+LOGO_PATH = "sprites/objects/flower/flower.png"
+LOGO_SPRITE = pygame.image.load(LOGO_PATH)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
-pygame.display.set_caption("Checheck game")
+pygame.display.set_caption("Чәчәк Quest")
+pygame.display.set_icon(LOGO_SPRITE)
 clock = pygame.time.Clock()
 
 data = load_game()
 print(data)
-if "scene" not in data.keys():
-    current_scene: Scene = make_scene_a()
-else:
-    current_scene: Scene = scenes.scenes[data["scene"]]
+current_scene: Scene = scenes.scenes[data["scene"]]
 
 def cmp_objects(obj1, obj2):
     if obj1["z"] < obj2["z"]:
@@ -84,8 +58,6 @@ while running:
                 res = current_scene.interact()
                 if res:
                     current_scene = res
-            if event.key == pygame.K_q:
-                current_scene.toggle_inventory()
                 
     screen.fill((0, 0, 0))
     scene_info = current_scene.get_draw_data()
@@ -106,9 +78,7 @@ while running:
         rect = sprite.get_rect(topleft=(x_l, y_t))
         screen.blit(sprite, rect)
 
-    if scene_info["inventory"]["open"]:
-        draw_inventory(scene_info["inventory"]["items"])
-    elif scene_info["ui"]["mode"] == "dialog":
+    if scene_info["ui"]["mode"] == "dialog":
         dialog_rect = pygame.Rect(0, HEIGHT - DIALOG_HEIGHT, WIDTH, DIALOG_HEIGHT)
         pygame.draw.rect(screen, DIALOG_COLOR, dialog_rect, border_radius=20)
         pygame.draw.rect(screen, BORDER_COLOR, dialog_rect, border_radius=20, width=BORDER_WIDTH)
