@@ -1,3 +1,5 @@
+from functools import cmp_to_key
+
 import pygame
 import sys
 import scenes
@@ -31,6 +33,12 @@ data = load_game()
 print(data)
 current_scene: Scene = scenes.scenes[data["scene"]]
 
+def cmp_objects(obj1, obj2):
+    if obj1["z"] != obj2["z"]:
+        return obj1["z"] < obj2["z"]
+
+    return obj1["rect"].y2 > obj2["rect"].y2
+
 running = True
 while running:
     for event in pygame.event.get():
@@ -50,7 +58,7 @@ while running:
 
     sorted_objects = scene_info["objects"]
     sorted_objects.append(scene_info["player"])
-    sorted_objects.sort(key=lambda obj: obj["z"])
+    sorted_objects.sort(key=cmp_to_key(cmp_objects))
 
     for obj in sorted_objects:
         rect = obj["rect"]
