@@ -39,3 +39,4 @@ def add_inventory_item(word: str, texture_path: str) -> None:
     with open("data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4)
 
+SCENES = dict()

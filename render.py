@@ -53,7 +53,7 @@ def draw_inventory(items):
 
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
-pygame.display.set_caption("Checheck game")
+pygame.display.set_caption("Чәчәк Quest")
 clock = pygame.time.Clock()
 
 data = load_game()
@@ -61,7 +61,7 @@ print(data)
 if "scene" not in data.keys():
     current_scene: Scene = root_scene()
 else:
-    current_scene: Scene = scenes.scenes[data["scene"]]
+    current_scene: Scene = scenes.SCENES[data["scene"]]
 
 
 def cmp_objects(obj1, obj2):

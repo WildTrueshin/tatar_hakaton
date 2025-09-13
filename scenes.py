@@ -6,7 +6,7 @@ home_b = root_b = False
 def home_scene() -> Scene:
     global home_b
     if home_b:
-        return scenes["home_scene"]
+        return SCENES["home_scene"]
     field = StaticObject(
         id='field',
         name='Поле',
@@ -31,6 +31,7 @@ def home_scene() -> Scene:
         ],
         repeatable=False,
         persist_progress=True,
+        reset_texture=[tuple(["root_scene", "flower", "sprites/objects/flower/flower_highlited.png"])],
         texture_path="sprites/objects/grandma.png",
         z=1,
     )
@@ -57,7 +58,7 @@ def home_scene() -> Scene:
 def root_scene() -> Scene:
     global root_b
     if root_b:
-        return scenes["root_scene"]
+        return SCENES["root_scene"]
     field = StaticObject(
         id='field',
         name='Поле',
@@ -67,6 +68,14 @@ def root_scene() -> Scene:
         texture_path="sprites/backgrounds/root.png",
         z=0,
         scale_texture_to_rect=True,
+    )
+    flower = StaticObject(
+        id="flower",
+        rect=Rect(20, 20, 30, 30),
+        solid=False,
+        interactable=False,
+        texture_path="sprites/objects/flower/flower.png",
+        z=1,
     )
     door = StaticObject(
         id="home_root",
@@ -99,7 +108,7 @@ def root_scene() -> Scene:
     root_b = True
     return Scene(
         id="root_scene",
-        objects=[field, door, wall, block_line],
+        objects=[field, flower, door, wall, block_line],
         player_pos=(30, 90),
         player_size=(16, 16),
         interact_distance=28.0,
@@ -109,7 +118,5 @@ def root_scene() -> Scene:
     )
 
 
-scenes = {
-    "root_scene": root_scene(),
-    "home_scene": home_scene()
-}
+SCENES["root_scene"] = root_scene()
+SCENES["home_scene"] = home_scene()
