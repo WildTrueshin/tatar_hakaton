@@ -1,6 +1,5 @@
 import pygame
 import sys
-import json
 import scenes
 from scene import Scene
 from data_helper import *
@@ -8,18 +7,18 @@ from data_helper import *
 pygame.init()
 
 info = pygame.display.Info()
-HEIGHT = info.current_h
-WIDTH = int(HEIGHT * 16 / 9)
-SCALE = HEIGHT / 300
+WIDTH = info.current_w
+HEIGHT = int(WIDTH / 16 * 9)
+SCALE = HEIGHT / 279
 FPS = 30
 DIALOG_COLOR = (246, 235, 165)
 TEXT_COLOR = (41, 43, 51)
 DIALOG_HEIGHT = int(HEIGHT / 5)
-DIALOG_FONT = pygame.font.SysFont("consolas", int(HEIGHT / 40))
-BORDER_COLOR = (117, 117, 56)
-BORDER_WIDTH = int(HEIGHT / 320)
+DIALOG_FONT = pygame.font.SysFont("consolas", int(HEIGHT / 20))
+BORDER_COLOR = (117, 56, 56)
+BORDER_WIDTH = int(HEIGHT / 200)
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
 pygame.display.set_caption("Checheck game")
 clock = pygame.time.Clock()
 
@@ -71,13 +70,13 @@ while running:
         screen.blit(text_surface, text_rect)
     else:
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             current_scene.move_forward()
-        if keys[pygame.K_s]:
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             current_scene.move_back()
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             current_scene.move_left()
-        if keys[pygame.K_d]:
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             current_scene.move_right()
 
     pygame.display.flip()
