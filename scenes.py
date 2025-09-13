@@ -89,7 +89,7 @@ def root_scene() -> Scene:
     )
     root_b = True
     return Scene(
-        id="scene_a",
+        id="root_scene",
         objects=[field, door, wall],
         player_pos=(30, 90),
         player_size=(16, 16),
