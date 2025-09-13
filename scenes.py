@@ -1,7 +1,12 @@
 from scene import *
 
+home_b = root_b = False
+
 
 def home_scene() -> Scene:
+    global home_b
+    if home_b:
+        return scenes["home_scene"]
     field = StaticObject(
         id='field',
         name='Поле',
@@ -29,9 +34,19 @@ def home_scene() -> Scene:
         texture_path="sprites/objects/grandma.png",
         z=0,
     )
+    door = StaticObject(
+        id="home_scene",
+        rect=Rect(20, 20, 120, 220),
+        solid=False,
+        interactable=True,
+        next_scene_factory=root_scene,
+        texture_path="sprites/objects/house1.png",
+        z=0,
+    )
+    home_b = True
     return Scene(
         id="home_scene",
-        objects=[field, granny],
+        objects=[field, granny, door],
         player_pos=(20, 20),
         player_size=(120, 120),
         player_texture_path=f"sprites/bahtiyar/down{0}.png",
@@ -39,7 +54,10 @@ def home_scene() -> Scene:
     )
 
 
-def make_scene_a() -> Scene:
+def root_scene() -> Scene:
+    global root_b
+    if root_b:
+        return scenes["root_scene"]
     field = StaticObject(
         id='field',
         name='Поле',
@@ -53,7 +71,7 @@ def make_scene_a() -> Scene:
     door = StaticObject(
         id="home_root",
         rect=Rect(200, 100, 250, 150),
-        solid=False,
+        solid=True,
         interactable=True,
         next_scene_factory=home_scene,
         texture_path="sprites/objects/house1.png",
@@ -69,6 +87,7 @@ def make_scene_a() -> Scene:
         z=0,
         scale_texture_to_rect=True,
     )
+    root_b = True
     return Scene(
         id="scene_a",
         objects=[field, door, wall],
@@ -82,5 +101,6 @@ def make_scene_a() -> Scene:
 
 
 scenes = {
-    "menu": make_scene_a()
+    "root_scene": root_scene(),
+    "home_scene": home_scene()
 }
