@@ -31,7 +31,7 @@ clock = pygame.time.Clock()
 
 data = load_game()
 print(data)
-current_scene: Scene = scenes.scenes[data["scene"]]
+current_scene: Scene = scenes.SCENES[data["scene"]]
 
 def cmp_objects(obj1, obj2):
     if obj1["z"] < obj2["z"]:
