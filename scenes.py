@@ -43,6 +43,7 @@ def home_scene() -> Scene:
         texture_path="sprites/objects/house1.png",
         z=0,
     )
+
     home_b = True
     return Scene(
         id="home_scene",
@@ -71,11 +72,20 @@ def root_scene() -> Scene:
     door = StaticObject(
         id="home_root",
         rect=Rect(200, 100, 250, 150),
-        solid=True,
+        solid=False,
         interactable=True,
         next_scene_factory=home_scene,
         texture_path="sprites/objects/house1.png",
         z=0,
+    )
+
+    block_line = StaticObject(
+        id="block_line",
+        rect=Rect(205, 125, 245, 140),
+        solid=True,
+        interactable=False,
+        texture_path="sprites/bahtiyar/down0.png",
+        z=-1,
     )
 
     wall = StaticObject(
@@ -90,7 +100,7 @@ def root_scene() -> Scene:
     root_b = True
     return Scene(
         id="root_scene",
-        objects=[field, door, wall],
+        objects=[field, door, wall, block_line],
         player_pos=(30, 90),
         player_size=(16, 16),
         interact_distance=28.0,
