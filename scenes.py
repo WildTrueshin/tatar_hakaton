@@ -15,7 +15,7 @@ def home_scene() -> Scene:
     granny = NPC(
         id="npc_granny",
         name="Әби",
-        rect=Rect(60, 60, 76, 92),
+        rect=Rect(110, 160, 200, 250),
         solid=False,
         interactable=True,
         dialog_lines=[
@@ -26,14 +26,14 @@ def home_scene() -> Scene:
         ],
         repeatable=False,
         persist_progress=True,
-        texture_path="sprites/objects/house1.png",
+        texture_path="sprites/objects/grandma.png",
         z=2,
     )
     return Scene(
         id="home_scene",
         objects=[field, granny],
         player_pos=(20, 20),
-        player_size=(160, 160),
+        player_size=(120, 120),
         player_texture_path="sprites/bahtiyar/front.png",
     )
 

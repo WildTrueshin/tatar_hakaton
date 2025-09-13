@@ -37,7 +37,10 @@ while running:
                 save_game(current_scene.get_name())
                 running = False
             if event.key == pygame.K_e:
-                current_scene = current_scene.interact()
+                res = current_scene.interact()
+                if res:
+                    current_scene = res
+                
     screen.fill((0, 0, 0))
     scene_info = current_scene.get_draw_data()
 

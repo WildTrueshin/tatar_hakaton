@@ -285,10 +285,10 @@ class Scene:
             return self.next_dialog_step()
         obj, dist = self._nearest_interactable()
         if obj is None or dist > self.interact_distance:
-            return self
+            return None
         if isinstance(obj, NPC) and obj.has_dialog() and (not obj.is_dialog_finished() or obj.repeatable):
             self.start_dialog_with(obj)
-            return self
+            return None
         return obj.on_interact(self)
 
     def interact(self) -> Optional["Scene"]:
