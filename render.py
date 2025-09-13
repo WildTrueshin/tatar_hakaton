@@ -5,7 +5,7 @@ import sys
 import scenes
 from scene import Scene
 from data_helper import *
-from scenes import make_scene_a
+from scenes import root_scene
 
 pygame.init()
 
@@ -59,7 +59,7 @@ clock = pygame.time.Clock()
 data = load_game()
 print(data)
 if "scene" not in data.keys():
-    current_scene: Scene = make_scene_a()
+    current_scene: Scene = root_scene()
 else:
     current_scene: Scene = scenes.scenes[data["scene"]]
 
