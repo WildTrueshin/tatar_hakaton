@@ -24,9 +24,12 @@ E_PATH = "sprites/system/use_e.png"
 E_SPRITE = pygame.image.load(E_PATH)
 E_SPRITE = pygame.transform.scale(E_SPRITE, (E_SIZE, E_SIZE))
 E_RECT = pygame.Rect(0, 0, E_SIZE, E_SIZE)
+LOGO_PATH = "sprites/objects/flower/flower.png"
+LOGO_SPRITE = pygame.image.load(LOGO_PATH)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
 pygame.display.set_caption("Чәчәк Quest")
+pygame.display.set_icon(LOGO_SPRITE)
 clock = pygame.time.Clock()
 
 data = load_game()
