@@ -94,22 +94,12 @@ def make_house_scene(
         voice_path="audios/pesi/pesi.ogg"
     )
 
-    carpet = ClickableObject(
-        id="carpet",
-        rect=Rect(152, 113, 358, 259),
-        solid=False,
-        interactable=False,
-        next_scene_factory=None,
-        inventory_texture_path="sprites/objects/carpet.png",
-        translation="Палас",
-        z=1,
-        voice_path="audios/palas/palas.ogg",
-    )
+
 
     return Scene(
         id=id,
         objects=[background, door, ebi, cat],
-        clickable_objects=[cat_clickable, carpet],
+        clickable_objects=[cat_clickable],
         player_pos=(0, 130),
         player_size=(100, 100),
         interact_distance=24.0,
@@ -452,22 +442,11 @@ def scene4() -> Scene:
         voice_path="audios/pesi/pesi.ogg"
     )
 
-    carpet = ClickableObject(
-        id="carpet",
-        rect=Rect(152, 113, 358, 259),
-        solid=False,
-        interactable=False,
-        next_scene_factory=None,
-        inventory_texture_path="sprites/objects/carpet.png",
-        translation="Палас",
-        z=1,
-        voice_path="audios/palas/palas.ogg"
-    )
 
     scene = Scene(
         id="scene4",
         objects=[background, ebi_big, ebi, cat],
-        clickable_objects=[cat_clickable, carpet],
+        clickable_objects=[cat_clickable],
         player_pos=(0, 130),
         player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
@@ -790,22 +769,10 @@ def scene8() -> Scene:
         voice_path="audios/pesi/pesi.ogg"
     )
 
-    carpet = ClickableObject(
-        id="carpet",
-        rect=Rect(152, 113, 358, 259),
-        solid=False,
-        interactable=False,
-        next_scene_factory=None,
-        inventory_texture_path="sprites/objects/carpet.png",
-        translation="Палас",
-        z=1,
-        voice_path="audios/palas/palas.ogg"
-    )
-
     scene = Scene(
         id="scene8",
         objects=[background, ebi_big, ebi, cat],
-        clickable_objects=[cat_clickable, carpet],
+        clickable_objects=[cat_clickable],
         player_pos=(0, 130),
         player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
