@@ -48,11 +48,11 @@ def make_house_scene(
     )
     door = StaticObject(
         id="door_exit",
-        rect=Rect(80, 100, 120, 160),
+        rect=Rect(0, 60, 70, 235),
         solid=False,
         interactable=True,
         next_scene_factory=outside_factory,
-        texture_path=None,
+        texture_path="sprites/backgrounds/home.png",
         z=-1,
     )
     grandma_texture = (
@@ -109,7 +109,7 @@ def make_house_scene(
         id=id,
         objects=[background, door, ebi, cat],
         clickable_objects=[cat_clickable, carpet],
-        player_pos=(50, 90),
+        player_pos=(0, 130),
         player_size=(100, 100),
         interact_distance=24.0,
         player_texture_path="sprites/bahtiyar/down0.png",
@@ -189,7 +189,7 @@ def scene1() -> Scene:
     flower = StaticObject(
         id="flower",
         name="Чәчәк",
-        rect=Rect(238, 212, 258, 236),
+        rect=Rect(238, 212 - 40, 258, 236 - 40),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/flower/flower.png",
@@ -237,7 +237,7 @@ def scene2() -> Scene:
     )
     flower = StaticObject(
         id="flower",
-        rect=Rect(238, 212, 258, 236),
+        rect=Rect(238, 212 - 40, 258, 236 - 40),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/flower/flower.png",
@@ -369,7 +369,7 @@ def scene3() -> Scene:
 
     flower = StaticObject(
         id="flower",
-        rect=Rect(238, 212, 258, 236),
+        rect=Rect(238, 212 - 40, 258, 236 - 40),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/flower/flower.png",
@@ -462,7 +462,7 @@ def scene4() -> Scene:
         id="scene4",
         objects=[background, ebi_big, ebi, cat],
         clickable_objects=[cat_clickable],
-        player_pos=(50, 90),
+        player_pos=(0, 130),
         player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
         player_z=1,
@@ -540,7 +540,7 @@ def scene5() -> Scene:
     flower = StaticObject(
         id="flower",
         name="Чәчәк",
-        rect=Rect(238, 212, 258, 236),
+        rect=Rect(238, 212 - 40, 258, 236 - 40),
         solid=False,
         interactable=True,
         next_scene_factory=scene6,
@@ -795,7 +795,7 @@ def scene8() -> Scene:
         id="scene8",
         objects=[background, ebi_big, ebi, cat],
         clickable_objects=[cat_clickable],
-        player_pos=(60, 90),
+        player_pos=(0, 130),
         player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
         player_z=1,
