@@ -19,10 +19,10 @@ from typing import Optional
 
 
 def make_house_scene(
-    id: str,
-    outside_factory: SceneFactory,
-    highlight: bool = False,
-    next_scene_factory: Optional[SceneFactory] = None,
+        id: str,
+        outside_factory: SceneFactory,
+        highlight: bool = False,
+        next_scene_factory: Optional[SceneFactory] = None,
 ) -> Scene:
     """Generic interior of the left house with grandma."""
     background = StaticObject(
@@ -228,7 +228,7 @@ def scene3() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(360, 212, 390, 255),
+        rect=Rect(368, 220, 390, 255),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -331,7 +331,7 @@ def scene5() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(360, 212, 390, 255),
+        rect=Rect(368, 220, 390, 255),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -397,7 +397,7 @@ def scene6() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(360, 212, 390, 255),
+        rect=Rect(368, 220, 390, 255),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -458,7 +458,7 @@ def scene7() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(360, 212, 390, 255),
+        rect=Rect(368, 220, 390, 255),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -551,7 +551,7 @@ def scene9() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(360, 212, 390, 255),
+        rect=Rect(368, 220, 390, 255),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -614,4 +614,3 @@ scenes = {
     "scene7_house": scene7_house(),
     "scene9_house": scene9_house(),
 }
-
