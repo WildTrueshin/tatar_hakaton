@@ -76,25 +76,32 @@ def add_notification(text: str, sound_path: Optional[str], frame_left: int = 50)
         _play_voice(sound_path)
     notifications_list.append(Notification(text, frame_left, sound_path))
 
-def draw_hud():
-    label = "Q-открыть/закрыть словарь"
+def draw_hud(label="Q-открыть/закрыть словарь", margin_h_ratio=0.03):
+    """
+    label            — текст надписи
+    margin_h_ratio   — верхний/правый отступ как доля высоты экрана (напр. 0.03 = 3% H)
+    """
+    W, H = WIDTH, HEIGHT
+    margin = int(H * margin_h_ratio)
+
     text = DIALOG_FONT.render(label, True, TEXT_COLOR)
 
-    center = (1205, 30)  # точка привязки как у тебя
-    # Отступы вокруг текста (зависят от высоты шрифта)
-    pad_x = max(8, text.get_height() // 3)
-    pad_y = max(4, text.get_height() // 6)
+    # Отступы внутри белого окошка — тоже от высоты
+    pad_y = max(2, int(H * 0.006))
+    pad_x = max(4, int(H * 0.010))
 
-    # Прямоугольник текста и фона
-    text_rect = text.get_rect(center=center)
+    text_rect = text.get_rect()
     bg_rect = pygame.Rect(0, 0, text_rect.width + pad_x * 2, text_rect.height + pad_y * 2)
-    bg_rect.center = center
 
-    # Фон и рамка
-    pygame.draw.rect(screen, (246, 235, 165), bg_rect, border_radius=6)
+    # Привязываем к правому верхнему углу
+    bg_rect.topright = (W - margin, margin)
+    text_rect.topright = (bg_rect.right - pad_x, bg_rect.top + pad_y)
+
+    # Фон + рамка
+    pygame.draw.rect(screen,  (246, 235, 165), bg_rect, border_radius=6)
     pygame.draw.rect(screen, BORDER_COLOR, bg_rect, width=BORDER_WIDTH, border_radius=6)
 
-    # Текст поверх
+    # Текст
     screen.blit(text, text_rect)
 def draw_notifications():
     global notifications_list
