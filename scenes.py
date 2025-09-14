@@ -184,7 +184,7 @@ def scene2() -> Scene:
         persist_progress=True,
         texture_path="sprites/objects/grandpa.png",
         z=1,
-        reward=("бабай", "sprites/objects/grandpa.png"),
+        reward=[("бабай", "sprites/objects/grandpa.png")],
         next_scene_factory=scene3,
     )
     scene = Scene(
@@ -286,7 +286,8 @@ def scene4() -> Scene:
         persist_progress=True,
         texture_path="sprites/objects/grandma.png",
         z=1,
-        reward=("әби", "sprites/objects/grandma.png"),
+        reward=[("әби", "sprites/objects/grandma.png"),
+                ("исәнмесез", "sprites/words/isanmesez.png")],
         next_scene_factory=scene5_house,
     )
     scene = Scene(
@@ -413,7 +414,7 @@ def scene6() -> Scene:
         persist_progress=True,
         texture_path="sprites/objects/flower/flower.png",
         z=1,
-        reward=("чәчәк", "sprites/objects/flower/flower.png"),
+        reward=[("чәчәк", "sprites/objects/flower/flower.png")],
         next_scene_factory=scene7,
     )
     scene = Scene(
@@ -502,6 +503,7 @@ def scene8() -> Scene:
         solid=False,
         interactable=True,
         dialog_lines=[{"text": "Рәхмәт", "voice": "audios/ebi/raxmet.ogg"}],
+        reward=[("рәхмәт", "sprites/words/rahmet.png")],
         repeatable=False,
         persist_progress=True,
         texture_path="sprites/objects/grandma.png",

@@ -124,8 +124,9 @@ class NPC(GameObject):
     _dialog_index: int = 0
     repeatable: bool = False
     persist_progress: bool = True
-    reward: Optional[Tuple[str, str]] = None
-
+    InventoryItem = Tuple[str, str]
+    InventoryReward = Union[InventoryItem, List[InventoryItem]]
+    reward: Optional[InventoryReward] = None
 
     def has_dialog(self) -> bool:
         return len(self.dialog_lines) > 0
@@ -353,13 +354,25 @@ class Scene:
 
     # ---------- Инвентарь ----------
 
-    def add_element(self, element: Tuple[str, str]) -> None:
-        """Добавить элемент (слово, путь к картинке) в инвентарь."""
-        word, path = element
-        # Не добавляем слово, если оно уже есть в словаре
-        inventory = load_inventory()
-        if word not in [item["word"] for item in inventory]:
-            add_inventory_item(word, path)
+    def add_element(self, element_or_elements: Union[Tuple[str, str], List[Tuple[str, str]]]) -> None:
+        """Добавляет в инвентарь один элемент (word, texture_path) или список таких элементов.
+           Дубликаты по 'word' не добавляются повторно."""
+
+        def _add_one(item: Tuple[str, str]) -> None:
+            word, path = item
+            inventory = load_inventory()
+            if word not in [it["word"] for it in inventory]:
+                add_inventory_item(word, path)
+
+        # Если нам передали список пар — пробегаемся, иначе считаем, что передана одна пара
+        if isinstance(element_or_elements, list) and element_or_elements and isinstance(element_or_elements[0],
+                                                                                        (list, tuple)):
+            for pair in element_or_elements:
+                if isinstance(pair, (list, tuple)) and len(pair) == 2:
+                    _add_one((pair[0], pair[1]))
+        else:
+            # одна пара
+            _add_one(element_or_elements)  # type: ignore[arg-type]
 
     def toggle_inventory(self) -> None:
         """Открыть/закрыть инвентарь. Нельзя открыть во время диалога."""
