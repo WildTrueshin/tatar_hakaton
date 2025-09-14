@@ -62,7 +62,7 @@ def make_house_scene(
     ebi = StaticObject(
         id="ebi",
         name="Әби",
-        rect=Rect(198, 158, 264, 246),
+        rect=Rect(108, 138, 174, 236),
         solid=False,
         interactable=highlight,
         next_scene_factory=next_scene_factory,
@@ -422,7 +422,7 @@ def scene4() -> Scene:
     ebi = StaticObject(
         id="ebi",
         name="Әби",
-        rect=Rect(198, 158, 264, 246),
+        rect=Rect(108, 138, 174, 226),
         solid=False,
         texture_path="sprites/objects/grandma.png",
         z=1,
@@ -746,7 +746,7 @@ def scene8() -> Scene:
     ebi = StaticObject(
         id="ebi",
         name="Әби",
-        rect=Rect(198, 158, 264, 246),
+        rect=Rect(108, 138, 174, 226),
         solid=False,
         texture_path="sprites/objects/grandma.png",
         z=1,
@@ -897,6 +897,7 @@ def scene9() -> Scene:
 
 def scene1_house() -> Scene:
     return make_house_scene("scene1_house", scene1)
+
 
 def scene3_house() -> Scene:
     return make_house_scene("scene3_house", scene3, True, scene4)
