@@ -57,6 +57,44 @@ E_PATH = "sprites/system/use_e.png"
 E_SPRITE = pygame.image.load(E_PATH)
 E_SPRITE = pygame.transform.scale(E_SPRITE, (E_SIZE, E_SIZE))
 E_RECT = pygame.Rect(0, 0, E_SIZE, E_SIZE)
+NOTIFICATION_PADDING = HEIGHT / 30
+NOTIFICATION_SIZE = HEIGHT / 15
+TEXT_PADDING = HEIGHT / 80
+LETTER_SIZE = HEIGHT / 30
+
+class Notification:
+    def __init__(self, text: str, frames_left: int, sound_path: Optional[str]):
+        self.text = text
+        self.frames_left = frames_left
+        self.sound_path = sound_path
+
+notifications_list = []
+
+def add_notification(text: str, sound_path: Optional[str], frame_left: int = 50):
+    global notifications_list
+    if sound_path:
+        _play_voice(sound_path)
+    notifications_list.append(Notification(text, frame_left, sound_path))
+
+def draw_notifications():
+    global notifications_list
+    active_notifications = []
+    for notification in notifications_list:
+        notification.frames_left -= 1
+        if notification.frames_left > 0:
+            active_notifications.append(notification)
+
+    for i in range(len(active_notifications)):
+        base = E_SIZE + NOTIFICATION_PADDING + i * (NOTIFICATION_PADDING + NOTIFICATION_SIZE)
+        width = TEXT_PADDING * 2 + LETTER_SIZE * len(active_notifications[i].text)
+        text = DIALOG_FONT.render(active_notifications[i].text, True, TEXT_COLOR)
+        rect = text.get_rect(center=(width / 2, base + NOTIFICATION_SIZE / 2))
+        out_rect = pygame.Rect(0, base, width, NOTIFICATION_SIZE)
+        pygame.draw.rect(screen, DIALOG_COLOR, out_rect, border_radius=10)
+        pygame.draw.rect(screen, BORDER_COLOR, out_rect, border_radius=10, width=BORDER_WIDTH)
+        screen.blit(text, rect)
+
+    notifications_list = active_notifications
 
 
 def draw_inventory(items):
@@ -111,7 +149,7 @@ def draw_dialog(text, items):
 
 # --- START SCREEN (assets & geometry) ---
 # Координаты кнопки в "игровых" пикселях 496x279 (масштабируем через SCALE)
-START_BUTTON_RECT_GAME = pygame.Rect(12, 113, 178, 52)  # x, y, w, h
+START_BUTTON_RECT_GAME = pygame.Rect(12, 215, 188, 52)  # x, y, w, h
 # Пути к картинкам стартового экрана (поменяй под себя)
 START_BG_PATH_CANDIDATES = [
     "sprites/backgrounds/start_screen.png",
@@ -147,8 +185,8 @@ def run_start_screen(screen, clock):
 
     # (опционально) текстовая подсказка
     tip_font = pygame.font.SysFont("consolas", int(HEIGHT / 28))
-    tip_surf = tip_font.render("Нажмите ENTER или клик по кнопке", True, (255, 255, 255))
-    tip_rect = tip_surf.get_rect(midbottom=(WIDTH // 2, HEIGHT - int(20 * SCALE)))
+    tip_surf = tip_font.render("Нажмите ENTER или клик по кнопке", True, (0, 0, 0))
+    tip_rect = tip_surf.get_rect(midbottom=(WIDTH // 2 + 300, HEIGHT - int(20 * SCALE)))
 
     while True:
         for event in pygame.event.get():
@@ -180,7 +218,7 @@ if not started:
 # После старта — грузим сейв и заходим в игру
 data = load_game()
 print(data)
-if isinstance(data.get("scene"), str) and data["scene"] in scenes.scenes:
+if False and isinstance(data.get("scene"), str) and data["scene"] in scenes.scenes:
     current_scene: Scene = scenes.scenes[data["scene"]]
 else:
     current_scene: Scene = scene1()
@@ -192,7 +230,6 @@ def cmp_objects(obj1, obj2):
     if obj1["rect"].y2 < obj2["rect"].y2:
         return -1
     return 1
-
 
 running = True
 while running:
@@ -231,6 +268,17 @@ while running:
                 VOICE_VOLUME = max(0.0, VOICE_VOLUME - 0.1); VOICE_CHANNEL.set_volume(VOICE_VOLUME)
             elif event.key == pygame.K_RIGHTBRACKET:  # ]
                 VOICE_VOLUME = min(1.0, VOICE_VOLUME + 0.1); VOICE_CHANNEL.set_volume(VOICE_VOLUME)
+
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                x, y = event.pos
+                x /= SCALE
+                y /= SCALE
+                print("process click:", x, y)
+                word, voice_path = current_scene.process_click(int(x), int(y))
+                if word:
+                    add_notification(f"Добавлено новое слово: {word}", voice_path)
+
 
     # ---------- управление персонажем ----------
     keys = pygame.key.get_pressed()
@@ -286,6 +334,8 @@ while running:
     else:
         if scene_info["ui"]["mode"] == "hint":
             screen.blit(E_SPRITE, E_RECT)
+
+    draw_notifications()
 
     pygame.display.flip()
     clock.tick(FPS)
