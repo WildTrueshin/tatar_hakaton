@@ -1,29 +1,2 @@
 {
-    "inventory": [
-        {
-            "word": "\u0431\u0430\u0431\u0430\u0439",
-            "texture_path": "sprites/objects/grandpa.png"
-        },
-        {
-            "word": "\u04d9\u0431\u0438",
-            "texture_path": "sprites/objects/grandma.png"
-        },
-        {
-            "word": "\u0438\u0441\u04d9\u043d\u043c\u0435\u0441\u0435\u0437",
-            "texture_path": "sprites/words/isanmesez.png"
-        },
-        {
-            "word": "\u043f\u0435\u0441\u0438",
-            "texture_path": "sprites/objects/cat.png"
-        },
-        {
-            "word": "\u042d\u0442",
-            "texture_path": "sprites/objects/dog.png"
-        },
-        {
-            "word": "\u041f\u0430\u043b\u0430\u0441",
-            "texture_path": "sprites/objects/carpet.png"
-        }
-    ],
-    "scene": "scene1_house"
 }

@@ -19,6 +19,17 @@ from scene import Scene, StaticObject, NPC, Rect, SceneFactory, ClickableObject,
 from typing import Optional
 
 
+def make_wall(house: StaticObject):
+    rec = house.rect
+    return StaticObject(
+        id="wall_" + house.id,
+        rect=Rect(rec.x1 + 17, rec.y1 + 62, rec.x2 - 17, rec.y2 - 35),
+        solid=True,
+        interactable=False,
+        z=-1,
+    )
+
+
 def make_house_scene(
         id: str,
         outside_factory: SceneFactory,
@@ -98,7 +109,7 @@ def make_house_scene(
         id=id,
         objects=[background, door, ebi, cat],
         clickable_objects=[cat_clickable, carpet],
-        player_pos=(230, 220),
+        player_pos=(50, 90),
         player_size=(100, 100),
         interact_distance=24.0,
         player_texture_path="sprites/bahtiyar/down0.png",
@@ -168,7 +179,7 @@ def scene1() -> Scene:
 
     door = StaticObject(
         id="door",
-        rect=Rect(70+40, 189, 190 - 40, 209),
+        rect=Rect(70 + 40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene1_house(),
@@ -186,7 +197,7 @@ def scene1() -> Scene:
     )
     return Scene(
         id="scene1",
-        objects=[background, house1, house2, door, babay, dog, flower],
+        objects=[background, house1, house2, door, babay, flower, make_wall(house1), make_wall(house2), dog],
         clickable_objects=[dog_clickable],
         player_pos=(230, 220),
         player_size=(35, 35),
@@ -279,7 +290,7 @@ def scene2() -> Scene:
 
     scene = Scene(
         id="scene2",
-        objects=[background, house1, house2, flower, babay_big, babay, dog],
+        objects=[background, house1, house2, flower, babay_big, babay, make_wall(house1), make_wall(house2), dog],
         clickable_objects=[dog_clickable],
         player_pos=(-100, -100),
         player_size=(35, 35),
@@ -327,7 +338,7 @@ def scene3() -> Scene:
     )
     door = StaticObject(
         id="door",
-        rect=Rect(70+40, 189, 190 - 40, 209),
+        rect=Rect(70 + 40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene3_house(),
@@ -366,7 +377,7 @@ def scene3() -> Scene:
     )
     return Scene(
         id="scene3",
-        objects=[background, house1, house2, door, babay, dog, flower],
+        objects=[background, house1, house2, door, babay, flower, make_wall(house1), make_wall(house2), dog],
         clickable_objects=[dog_clickable],
         player_pos=(230, 220),
         player_size=(35, 35),
@@ -450,8 +461,8 @@ def scene4() -> Scene:
     scene = Scene(
         id="scene4",
         objects=[background, ebi_big, ebi, cat],
-        clickable_objects=[cat_clickable, carpet],
-        player_pos=(-100, -100),
+        clickable_objects=[cat_clickable],
+        player_pos=(50, 90),
         player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
         player_z=1,
@@ -519,7 +530,7 @@ def scene5() -> Scene:
 
     door = StaticObject(
         id="door",
-        rect=Rect(70+40, 189, 190 - 40, 209),
+        rect=Rect(70 + 40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene5_house(),
@@ -538,7 +549,7 @@ def scene5() -> Scene:
     )
     return Scene(
         id="scene5",
-        objects=[background, house1, house2, door, babay, dog, flower],
+        objects=[background, house1, house2, door, babay, flower, make_wall(house1), make_wall(house2), dog],
         clickable_objects=[dog_clickable],
         player_pos=(230, 220),
         player_size=(35, 35),
@@ -622,7 +633,7 @@ def scene6() -> Scene:
     )
     scene = Scene(
         id="scene6",
-        objects=[background, house1, house2, babay, flower_big, dog],
+        objects=[background, house1, house2, babay, flower_big, make_wall(house1), make_wall(house2), dog],
         clickable_objects=[dog_clickable],
         player_pos=(-100, -100),
         player_size=(35, 35),
@@ -692,7 +703,7 @@ def scene7() -> Scene:
 
     door = StaticObject(
         id="door",
-        rect=Rect(70+40, 189, 190 - 40, 209),
+        rect=Rect(70 + 40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene7_house(),
@@ -701,7 +712,7 @@ def scene7() -> Scene:
     )
     return Scene(
         id="scene7",
-        objects=[background, house1, house2, door, babay, dog],
+        objects=[background, house1, house2, door, babay, make_wall(house1), make_wall(house2), dog],
         clickable_objects=[dog_clickable],
         player_pos=(230, 220),
         player_size=(35, 35),
@@ -783,8 +794,8 @@ def scene8() -> Scene:
     scene = Scene(
         id="scene8",
         objects=[background, ebi_big, ebi, cat],
-        clickable_objects=[cat_clickable, carpet],
-        player_pos=(-100, -100),
+        clickable_objects=[cat_clickable],
+        player_pos=(60, 90),
         player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
         player_z=1,
@@ -852,7 +863,7 @@ def scene9() -> Scene:
 
     door = StaticObject(
         id="door",
-        rect=Rect(70+40, 189, 190 - 40, 209),
+        rect=Rect(70 + 40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene9_house(),
@@ -861,7 +872,7 @@ def scene9() -> Scene:
     )
     return Scene(
         id="scene9",
-        objects=[background, house1, house2, door, babay, dog],
+        objects=[background, house1, house2, door, babay, make_wall(house1), make_wall(house2), dog],
         clickable_objects=[dog_clickable],
         player_pos=(230, 220),
         player_size=(35, 35),
