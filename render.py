@@ -76,6 +76,26 @@ def add_notification(text: str, sound_path: Optional[str], frame_left: int = 50)
         _play_voice(sound_path)
     notifications_list.append(Notification(text, frame_left, sound_path))
 
+def draw_hud():
+    label = "Q-открыть/закрыть словарь"
+    text = DIALOG_FONT.render(label, True, TEXT_COLOR)
+
+    center = (1205, 30)  # точка привязки как у тебя
+    # Отступы вокруг текста (зависят от высоты шрифта)
+    pad_x = max(8, text.get_height() // 3)
+    pad_y = max(4, text.get_height() // 6)
+
+    # Прямоугольник текста и фона
+    text_rect = text.get_rect(center=center)
+    bg_rect = pygame.Rect(0, 0, text_rect.width + pad_x * 2, text_rect.height + pad_y * 2)
+    bg_rect.center = center
+
+    # Фон и рамка
+    pygame.draw.rect(screen, (246, 235, 165), bg_rect, border_radius=6)
+    pygame.draw.rect(screen, BORDER_COLOR, bg_rect, width=BORDER_WIDTH, border_radius=6)
+
+    # Текст поверх
+    screen.blit(text, text_rect)
 def draw_notifications():
     global notifications_list
     active_notifications = []
@@ -336,7 +356,7 @@ while running:
             screen.blit(E_SPRITE, E_RECT)
 
     draw_notifications()
-
+    draw_hud()
     pygame.display.flip()
     clock.tick(FPS)
 
