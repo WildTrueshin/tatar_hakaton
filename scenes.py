@@ -14,7 +14,6 @@ Interacting with a highlighted object adds the corresponding word and
 placeholder image to the player's inventory.
 """
 from gettext import translation
-
 from scene import Scene, StaticObject, NPC, Rect, SceneFactory, ClickableObject, GameObject
 from typing import Optional
 
@@ -52,7 +51,7 @@ def make_house_scene(
         solid=False,
         interactable=True,
         next_scene_factory=outside_factory,
-        texture_path="sprites/backgrounds/home.png",
+        texture_path=None,
         z=-1,
     )
     grandma_texture = (
@@ -91,7 +90,8 @@ def make_house_scene(
         next_scene_factory=None,
         inventory_texture_path="sprites/objects/cat.png",
         z=-10,
-        translation="песи"
+        translation="песи",
+        voice_path="audios/pesi/pesi.ogg"
     )
 
     carpet = ClickableObject(
@@ -102,7 +102,8 @@ def make_house_scene(
         next_scene_factory=None,
         inventory_texture_path="sprites/objects/carpet.png",
         translation="Палас",
-        z=1
+        z=1,
+        voice_path="audios/palas/palas.ogg",
     )
 
     return Scene(
@@ -174,7 +175,8 @@ def scene1() -> Scene:
         interactable=False,
         inventory_texture_path="sprites/objects/dog.png",
         translation="Эт",
-        z=1
+        z=1,
+        voice_path="audios/et/et.ogg"
     )
 
     door = StaticObject(
@@ -285,7 +287,8 @@ def scene2() -> Scene:
         interactable=False,
         inventory_texture_path="sprites/objects/dog.png",
         translation="Эт",
-        z=1
+        z=1,
+        voice_path="audios/et/et.ogg"
     )
 
     scene = Scene(
@@ -364,7 +367,8 @@ def scene3() -> Scene:
         interactable=False,
         inventory_texture_path="sprites/objects/dog.png",
         translation="Эт",
-        z=1
+        z=1,
+        voice_path="audios/et/et.ogg"
     )
 
     flower = StaticObject(
@@ -444,7 +448,8 @@ def scene4() -> Scene:
         next_scene_factory=None,
         inventory_texture_path="sprites/objects/cat.png",
         z=-10,
-        translation="песи"
+        translation="песи",
+        voice_path="audios/pesi/pesi.ogg"
     )
 
     carpet = ClickableObject(
@@ -455,13 +460,14 @@ def scene4() -> Scene:
         next_scene_factory=None,
         inventory_texture_path="sprites/objects/carpet.png",
         translation="Палас",
-        z=1
+        z=1,
+        voice_path="audios/palas/palas.ogg"
     )
 
     scene = Scene(
         id="scene4",
         objects=[background, ebi_big, ebi, cat],
-        clickable_objects=[cat_clickable],
+        clickable_objects=[cat_clickable, carpet],
         player_pos=(0, 130),
         player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
@@ -525,7 +531,8 @@ def scene5() -> Scene:
         interactable=False,
         inventory_texture_path="sprites/objects/dog.png",
         translation="Эт",
-        z=1
+        z=1,
+        voice_path="audios/et/et.ogg"
     )
 
     door = StaticObject(
@@ -556,7 +563,7 @@ def scene5() -> Scene:
         interact_distance=10.0,
         player_texture_path="sprites/bahtiyar/down0.png",
         scale_player_texture_to_rect=True,
-        player_z=1,
+        player_z=1
     )
 
 
@@ -614,7 +621,8 @@ def scene6() -> Scene:
         interactable=False,
         inventory_texture_path="sprites/objects/dog.png",
         translation="Эт",
-        z=1
+        z=1,
+        voice_path="audios/et/et.ogg"
     )
 
     flower_big = NPC(
@@ -698,7 +706,8 @@ def scene7() -> Scene:
         interactable=False,
         inventory_texture_path="sprites/objects/dog.png",
         translation="Эт",
-        z=1
+        z=1,
+        voice_path="audios/et/et.ogg"
     )
 
     door = StaticObject(
@@ -777,7 +786,8 @@ def scene8() -> Scene:
         next_scene_factory=None,
         inventory_texture_path="sprites/objects/cat.png",
         z=-10,
-        translation="песи"
+        translation="песи",
+        voice_path="audios/pesi/pesi.ogg"
     )
 
     carpet = ClickableObject(
@@ -788,13 +798,14 @@ def scene8() -> Scene:
         next_scene_factory=None,
         inventory_texture_path="sprites/objects/carpet.png",
         translation="Палас",
-        z=1
+        z=1,
+        voice_path="audios/palas/palas.ogg"
     )
 
     scene = Scene(
         id="scene8",
         objects=[background, ebi_big, ebi, cat],
-        clickable_objects=[cat_clickable],
+        clickable_objects=[cat_clickable, carpet],
         player_pos=(0, 130),
         player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
@@ -858,7 +869,8 @@ def scene9() -> Scene:
         interactable=False,
         inventory_texture_path="sprites/objects/dog.png",
         translation="Эт",
-        z=1
+        z=1,
+        voice_path="audios/et/et.ogg"
     )
 
     door = StaticObject(
@@ -885,7 +897,6 @@ def scene9() -> Scene:
 
 def scene1_house() -> Scene:
     return make_house_scene("scene1_house", scene1)
-
 
 def scene3_house() -> Scene:
     return make_house_scene("scene3_house", scene3, True, scene4)
