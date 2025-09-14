@@ -386,6 +386,7 @@ class Scene:
         """Открыть/закрыть инвентарь. Нельзя открыть во время диалога."""
         if self._is_dialog_active():
             return
+
         self.inventory_open = not self.inventory_open
         if self.inventory_open:
             # Скрываем подсказки при открытии инвентаря
