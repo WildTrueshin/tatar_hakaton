@@ -122,6 +122,7 @@ class ClickableObject(GameObject):
     inventory_texture_path: str = None
     translation: str = None
     texture_path: str = "sprites/system/empty.png"
+    voice_path: str = None
 
 
 @dataclass
@@ -395,16 +396,16 @@ class Scene:
 
     # ---------- Обработка клика -------
 
-    def process_click(self, x: int, y: int) -> Optional[str]:
+    def process_click(self, x: int, y: int) -> tuple[Optional[str], Optional[str]]:
         if not self.clickable_objects:
-            return None
+            return None, None
         for obj in self.clickable_objects:
             if obj.rect.x1 <= x <= obj.rect.x2:
                 if obj.rect.y1 <= y <= obj.rect.y2:
                     self.add_element((obj.translation, obj.inventory_texture_path))
                     self.clickable_objects.remove(obj)
-                    return obj.translation
-        return None
+                    return obj.translation, obj.voice_path
+        return None, None
 
     # ---------- Данные для рендера (включая пути к текстурам) ----------
 

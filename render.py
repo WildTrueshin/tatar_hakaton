@@ -63,15 +63,18 @@ TEXT_PADDING = HEIGHT / 80
 LETTER_SIZE = HEIGHT / 30
 
 class Notification:
-    def __init__(self, text, frames_left):
+    def __init__(self, text: str, frames_left: int, sound_path: Optional[str]):
         self.text = text
         self.frames_left = frames_left
+        self.sound_path = sound_path
 
 notifications_list = []
 
-def add_notification(text: str, frame_left: int = 50):
+def add_notification(text: str, sound_path: Optional[str], frame_left: int = 50):
     global notifications_list
-    notifications_list.append(Notification(text, frame_left))
+    if sound_path:
+        _play_voice(sound_path)
+    notifications_list.append(Notification(text, frame_left, sound_path))
 
 def draw_notifications():
     global notifications_list
@@ -272,9 +275,9 @@ while running:
                 x /= SCALE
                 y /= SCALE
                 print("process click:", x, y)
-                word = current_scene.process_click(int(x), int(y))
+                word, voice_path = current_scene.process_click(int(x), int(y))
                 if word:
-                    add_notification(f"Добавлено новое слово: {word}")
+                    add_notification(f"Добавлено новое слово: {word}", voice_path)
 
 
     # ---------- управление персонажем ----------
