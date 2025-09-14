@@ -69,7 +69,7 @@ class Notification:
 
 notifications_list = []
 
-def add_notification(text: str, frame_left: int = 10):
+def add_notification(text: str, frame_left: int = 50):
     global notifications_list
     notifications_list.append(Notification(text, frame_left))
 
@@ -215,7 +215,7 @@ if not started:
 # После старта — грузим сейв и заходим в игру
 data = load_game()
 print(data)
-if isinstance(data.get("scene"), str) and data["scene"] in scenes.scenes:
+if False and isinstance(data.get("scene"), str) and data["scene"] in scenes.scenes:
     current_scene: Scene = scenes.scenes[data["scene"]]
 else:
     current_scene: Scene = scene1()
