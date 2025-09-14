@@ -77,10 +77,10 @@ def make_house_scene(
         clickable_objects=[carpet],
         player_pos=(230, 220),
         player_size=(100, 100),
-        interact_distance=28.0,
+        interact_distance=24.0,
         player_texture_path="sprites/bahtiyar/down0.png",
         scale_player_texture_to_rect=True,
-        player_z=2,
+        player_z=1,
     )
 
 
@@ -97,7 +97,7 @@ def scene1() -> Scene:
     )
     house1 = StaticObject(
         id="house1",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70, 90, 190, 209),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house1.png",
@@ -105,7 +105,7 @@ def scene1() -> Scene:
     )
     house2 = StaticObject(
         id="house2",
-        rect=Rect(330, 110, 475, 240),
+        rect=Rect(250, 25, 350, 120),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house2.png",
@@ -114,7 +114,7 @@ def scene1() -> Scene:
     babay = StaticObject(
         id="babay",
         name="Бабай",
-        rect=Rect(360, 212, 390, 255),
+        rect=Rect(340, 150, 370, 185),
         solid=False,
         interactable=True,
         next_scene_factory=scene2,
@@ -123,7 +123,7 @@ def scene1() -> Scene:
     )
     door = StaticObject(
         id="door",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70+40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene1_house(),
@@ -144,7 +144,7 @@ def scene1() -> Scene:
         objects=[background, house1, house2, door, babay, flower],
         player_pos=(230, 220),
         player_size=(35, 35),
-        interact_distance=28.0,
+        interact_distance=10.0,
         player_texture_path="sprites/bahtiyar/down0.png",
         scale_player_texture_to_rect=True,
         player_z=1,
@@ -164,7 +164,7 @@ def scene2() -> Scene:
     )
     house1 = StaticObject(
         id="house1",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70, 90, 190, 209),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house1.png",
@@ -172,7 +172,7 @@ def scene2() -> Scene:
     )
     house2 = StaticObject(
         id="house2",
-        rect=Rect(330, 110, 475, 240),
+        rect=Rect(250, 25, 350, 120),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house2.png",
@@ -201,9 +201,17 @@ def scene2() -> Scene:
         reward=[("бабай", "sprites/objects/grandpa.png")],
         next_scene_factory=scene3,
     )
+    babay = StaticObject(
+        id="babay",
+        rect=Rect(340, 150, 360, 183),
+        solid=False,
+        interactable=False,
+        texture_path="sprites/objects/grandpa.png",
+        z=1,
+    )
     scene = Scene(
         id="scene2",
-        objects=[background, house1, house2, flower, babay_big],
+        objects=[background, house1, house2, flower, babay_big, babay],
         player_pos=(-100, -100),
         player_size=(35, 35),
         player_texture_path="sprites/bahtiyar/down0.png",
@@ -226,7 +234,7 @@ def scene3() -> Scene:
     )
     house1 = StaticObject(
         id="house1",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70, 90, 190, 209),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house_highlited.png",
@@ -234,7 +242,7 @@ def scene3() -> Scene:
     )
     house2 = StaticObject(
         id="house2",
-        rect=Rect(330, 110, 475, 240),
+        rect=Rect(250, 25, 350, 120),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house2.png",
@@ -242,7 +250,7 @@ def scene3() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(368, 220, 390, 255),
+        rect=Rect(340, 150, 360, 183),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -250,7 +258,7 @@ def scene3() -> Scene:
     )
     door = StaticObject(
         id="door",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70+40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene3_house(),
@@ -270,7 +278,7 @@ def scene3() -> Scene:
         objects=[background, house1, house2, door, babay, flower],
         player_pos=(230, 220),
         player_size=(35, 35),
-        interact_distance=28.0,
+        interact_distance=10.0,
         player_texture_path="sprites/bahtiyar/down0.png",
         scale_player_texture_to_rect=True,
         player_z=1,
@@ -304,11 +312,19 @@ def scene4() -> Scene:
                 ("исәнмесез", "sprites/words/isanmesez.png")],
         next_scene_factory=scene5_house,
     )
+    ebi = StaticObject(
+        id="ebi",
+        name="Әби",
+        rect=Rect(198, 158, 264, 246),
+        solid=False,
+        texture_path="sprites/objects/grandma.png",
+        z=1,
+    )
     scene = Scene(
         id="scene4",
-        objects=[background, ebi_big],
+        objects=[background, ebi_big, ebi],
         player_pos=(-100, -100),
-        player_size=(35, 35),
+        player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
         player_z=1,
     )
@@ -329,7 +345,7 @@ def scene5() -> Scene:
     )
     house1 = StaticObject(
         id="house1",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70, 90, 190, 209),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house1.png",
@@ -337,7 +353,7 @@ def scene5() -> Scene:
     )
     house2 = StaticObject(
         id="house2",
-        rect=Rect(330, 110, 475, 240),
+        rect=Rect(250, 25, 350, 120),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house2.png",
@@ -345,7 +361,7 @@ def scene5() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(368, 220, 390, 255),
+        rect=Rect(340, 150, 360, 183),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -353,7 +369,7 @@ def scene5() -> Scene:
     )
     door = StaticObject(
         id="door",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70+40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene5_house(),
@@ -375,7 +391,7 @@ def scene5() -> Scene:
         objects=[background, house1, house2, door, babay, flower],
         player_pos=(230, 220),
         player_size=(35, 35),
-        interact_distance=28.0,
+        interact_distance=10.0,
         player_texture_path="sprites/bahtiyar/down0.png",
         scale_player_texture_to_rect=True,
         player_z=1,
@@ -395,7 +411,7 @@ def scene6() -> Scene:
     )
     house1 = StaticObject(
         id="house1",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70, 90, 190, 209),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house1.png",
@@ -403,7 +419,7 @@ def scene6() -> Scene:
     )
     house2 = StaticObject(
         id="house2",
-        rect=Rect(330, 110, 475, 240),
+        rect=Rect(250, 25, 350, 120),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house2.png",
@@ -411,7 +427,7 @@ def scene6() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(368, 220, 390, 255),
+        rect=Rect(340, 150, 360, 183),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -456,7 +472,7 @@ def scene7() -> Scene:
     )
     house1 = StaticObject(
         id="house1",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70, 90, 190, 209),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house_highlited.png",
@@ -464,7 +480,7 @@ def scene7() -> Scene:
     )
     house2 = StaticObject(
         id="house2",
-        rect=Rect(330, 110, 475, 240),
+        rect=Rect(250, 25, 350, 120),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house2.png",
@@ -472,7 +488,7 @@ def scene7() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(368, 220, 390, 255),
+        rect=Rect(340, 150, 360, 183),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -480,7 +496,7 @@ def scene7() -> Scene:
     )
     door = StaticObject(
         id="door",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70+40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene7_house(),
@@ -492,7 +508,7 @@ def scene7() -> Scene:
         objects=[background, house1, house2, door, babay],
         player_pos=(230, 220),
         player_size=(35, 35),
-        interact_distance=28.0,
+        interact_distance=10.0,
         player_texture_path="sprites/bahtiyar/down0.png",
         scale_player_texture_to_rect=True,
         player_z=1,
@@ -510,6 +526,14 @@ def scene8() -> Scene:
         z=0,
         scale_texture_to_rect=True,
     )
+    ebi = StaticObject(
+        id="ebi",
+        name="Әби",
+        rect=Rect(198, 158, 264, 246),
+        solid=False,
+        texture_path="sprites/objects/grandma.png",
+        z=1,
+    )
     ebi_big = NPC(
         id="ebi_big_final",
         name="Әби",
@@ -526,9 +550,9 @@ def scene8() -> Scene:
     )
     scene = Scene(
         id="scene8",
-        objects=[background, ebi_big],
+        objects=[background, ebi_big, ebi],
         player_pos=(-100, -100),
-        player_size=(80, 80),
+        player_size=(100, 100),
         player_texture_path="sprites/bahtiyar/down0.png",
         player_z=1,
     )
@@ -549,7 +573,7 @@ def scene9() -> Scene:
     )
     house1 = StaticObject(
         id="house1",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70, 90, 190, 209),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house1.png",
@@ -557,7 +581,7 @@ def scene9() -> Scene:
     )
     house2 = StaticObject(
         id="house2",
-        rect=Rect(330, 110, 475, 240),
+        rect=Rect(250, 25, 350, 120),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/house2.png",
@@ -565,7 +589,7 @@ def scene9() -> Scene:
     )
     babay = StaticObject(
         id="babay",
-        rect=Rect(368, 220, 390, 255),
+        rect=Rect(340, 150, 360, 183),
         solid=False,
         interactable=False,
         texture_path="sprites/objects/grandpa.png",
@@ -573,7 +597,7 @@ def scene9() -> Scene:
     )
     door = StaticObject(
         id="door",
-        rect=Rect(85, 35, 220, 160),
+        rect=Rect(70+40, 189, 190 - 40, 209),
         solid=False,
         interactable=True,
         next_scene_factory=lambda: scene9_house(),
@@ -585,7 +609,7 @@ def scene9() -> Scene:
         objects=[background, house1, house2, door, babay],
         player_pos=(230, 220),
         player_size=(35, 35),
-        interact_distance=28.0,
+        interact_distance=10.0,
         player_texture_path="sprites/bahtiyar/down0.png",
         scale_player_texture_to_rect=True,
         player_z=1,
