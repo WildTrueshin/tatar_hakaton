@@ -146,7 +146,7 @@ def draw_dialog(text, items):
 
 # --- START SCREEN (assets & geometry) ---
 # Координаты кнопки в "игровых" пикселях 496x279 (масштабируем через SCALE)
-START_BUTTON_RECT_GAME = pygame.Rect(12, 113, 178, 52)  # x, y, w, h
+START_BUTTON_RECT_GAME = pygame.Rect(12, 215, 188, 52)  # x, y, w, h
 # Пути к картинкам стартового экрана (поменяй под себя)
 START_BG_PATH_CANDIDATES = [
     "sprites/backgrounds/start_screen.png",
@@ -182,8 +182,8 @@ def run_start_screen(screen, clock):
 
     # (опционально) текстовая подсказка
     tip_font = pygame.font.SysFont("consolas", int(HEIGHT / 28))
-    tip_surf = tip_font.render("Нажмите ENTER или клик по кнопке", True, (255, 255, 255))
-    tip_rect = tip_surf.get_rect(midbottom=(WIDTH // 2, HEIGHT - int(20 * SCALE)))
+    tip_surf = tip_font.render("Нажмите ENTER или клик по кнопке", True, (0, 0, 0))
+    tip_rect = tip_surf.get_rect(midbottom=(WIDTH // 2 + 300, HEIGHT - int(20 * SCALE)))
 
     while True:
         for event in pygame.event.get():

@@ -52,7 +52,7 @@ def make_house_scene(
     ebi = StaticObject(
         id="ebi",
         name="Әби",
-        rect=Rect(158, 208, 194, 264),
+        rect=Rect(198, 158, 264, 246),
         solid=False,
         interactable=highlight,
         next_scene_factory=next_scene_factory,
@@ -76,7 +76,7 @@ def make_house_scene(
         objects=[background, door, ebi],
         clickable_objects=[carpet],
         player_pos=(230, 220),
-        player_size=(70, 70),
+        player_size=(100, 100),
         interact_distance=28.0,
         player_texture_path="sprites/bahtiyar/down0.png",
         scale_player_texture_to_rect=True,
