@@ -77,19 +77,81 @@ def draw_dialog(text, items):
             screen.blit(img, img_rect)
         x += surf.get_width() + space_w
 
+# --- START SCREEN (assets & geometry) ---
+# Координаты кнопки в "игровых" пикселях 496x279 (масштабируем через SCALE)
+START_BUTTON_RECT_GAME = pygame.Rect(12, 113, 178, 52)  # x, y, w, h
+# Пути к картинкам стартового экрана (поменяй под себя)
+START_BG_PATH_CANDIDATES = [
+    "sprites/backgrounds/start_screen.png",
+]
+START_BTN_PATH_CANDIDATES = [
+    "sprites/button/start_button_left.png",
+]
+
+def _first_existing_image(candidates):
+    for p in candidates:
+        try:
+            pygame.image.load(p)  # just to check it exists/loads
+            return p
+        except Exception:
+            continue
+    raise FileNotFoundError("Не найдено изображение стартового экрана. Проверь пути.")
+
+def run_start_screen(screen, clock):
+    """Показывает стартовый экран. Возвращает True если начали игру, False если вышли."""
+    bg_path = _first_existing_image(START_BG_PATH_CANDIDATES)
+    btn_path = _first_existing_image(START_BTN_PATH_CANDIDATES)
+
+    bg_img = pygame.image.load(bg_path).convert_alpha()
+    bg_img = pygame.transform.scale(bg_img, (WIDTH, HEIGHT))
+
+    # Масштабируем кнопку из координат 496x279 под текущее окно
+    br = START_BUTTON_RECT_GAME
+    btn_w, btn_h = int(br.w * SCALE), int(br.h * SCALE)
+    btn_x, btn_y = int(br.x * SCALE), int(br.y * SCALE)
+    btn_img = pygame.image.load(btn_path).convert_alpha()
+    btn_img = pygame.transform.scale(btn_img, (btn_w, btn_h))
+    btn_rect = pygame.Rect(btn_x, btn_y, btn_w, btn_h)
+
+    # (опционально) текстовая подсказка
+    tip_font = pygame.font.SysFont("consolas", int(HEIGHT / 28))
+    tip_surf = tip_font.render("Нажмите ENTER или клик по кнопке", True, (255, 255, 255))
+    tip_rect = tip_surf.get_rect(midbottom=(WIDTH // 2, HEIGHT - int(20 * SCALE)))
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return False
+            if event.type == pygame.KEYDOWN and event.key in (pygame.K_RETURN, pygame.K_SPACE, pygame.K_e):
+                return True
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if btn_rect.collidepoint(event.pos):
+                    return True
+
+        screen.blit(bg_img, (0, 0))
+        screen.blit(btn_img, btn_rect)
+        screen.blit(tip_surf, tip_rect)
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
 pygame.display.set_caption("Checheck game")
 clock = pygame.time.Clock()
+# Сначала показываем стартовый экран
+started = run_start_screen(screen, clock)
+if not started:
+    pygame.quit()
+    sys.exit()
 
+# После старта — грузим сейв и заходим в игру
 data = load_game()
 print(data)
-#if "scene" not in data.keys():
-current_scene: Scene = scene1()
-#else:
-#    current_scene: Scene = scenes.scenes[data["scene"]]
-
-
+if isinstance(data.get("scene"), str) and data["scene"] in scenes.scenes:
+    current_scene: Scene = scenes.scenes[data["scene"]]
+else:
+    current_scene: Scene = scene1()
 def cmp_objects(obj1, obj2):
     if obj1["z"] < obj2["z"]:
         return -1
