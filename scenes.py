@@ -13,8 +13,9 @@ Scene order:
 Interacting with a highlighted object adds the corresponding word and
 placeholder image to the player's inventory.
 """
+from gettext import translation
 
-from scene import Scene, StaticObject, NPC, Rect, SceneFactory
+from scene import Scene, StaticObject, NPC, Rect, SceneFactory, ClickableObject, GameObject
 from typing import Optional
 
 
@@ -58,9 +59,22 @@ def make_house_scene(
         texture_path=grandma_texture,
         z=1,
     )
+
+    carpet = ClickableObject(
+        id="carpet",
+        rect=Rect(152, 113, 358, 259),
+        solid=False,
+        interactable=False,
+        next_scene_factory=None,
+        inventory_texture_path="sprites/objects/carpet.png",
+        translation="Палас",
+        z=1
+    )
+
     return Scene(
         id=id,
         objects=[background, door, ebi],
+        clickable_objects=[carpet],
         player_pos=(230, 220),
         player_size=(70, 70),
         interact_distance=28.0,
