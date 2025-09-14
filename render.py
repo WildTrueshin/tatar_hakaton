@@ -7,7 +7,39 @@ from scene import Scene
 from data_helper import *
 from scenes import scene1
 
+# --- голос/озвучка ---
+pygame.mixer.pre_init(44100, -16, 2, 512)
+
 pygame.init()
+pygame.mixer.init()
+
+VOICE_ENABLED = True
+VOICE_VOLUME = 0.85
+AUTO_ADVANCE_DIALOG = False  # если True — авто-переход к следующей реплике после окончания звука
+
+VOICE_CHANNEL = pygame.mixer.Channel(5)      # отдельный канал под озвучку
+VOICE_END_EVENT = pygame.USEREVENT + 7       # событие «озвучка завершилась»
+VOICE_CACHE = {}                             # кэш звуков по пути
+
+def _play_voice(path: Optional[str]):
+    VOICE_CHANNEL.stop()
+    if not VOICE_ENABLED or not path:
+        return
+    try:
+        snd = VOICE_CACHE.get(path)
+        if snd is None:
+            snd = pygame.mixer.Sound(path)
+            VOICE_CACHE[path] = snd
+        VOICE_CHANNEL.set_volume(VOICE_VOLUME)
+        VOICE_CHANNEL.play(snd)
+        VOICE_CHANNEL.set_endevent(VOICE_END_EVENT)
+    except Exception as e:
+        print("voice error:", e)
+
+# для отслеживания изменения реплик
+_last_ui_mode = None
+_last_dialog_text = None
+_last_voice_path = None
 
 info = pygame.display.Info()
 WIDTH = info.current_w
@@ -164,21 +196,43 @@ def cmp_objects(obj1, obj2):
 
 running = True
 while running:
+    # ---------- события ----------
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN:
+
+        # Авто-переход к следующей реплике, когда закончилась озвучка
+        elif event.type == VOICE_END_EVENT and AUTO_ADVANCE_DIALOG and current_scene.text_window.mode == "dialog":
+            VOICE_CHANNEL.stop()
+            res = current_scene.interact()   # то же, что нажать E
+            if res:
+                current_scene = res
+
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 save_game(current_scene.get_name())
                 running = False
-            if event.key == pygame.K_e:
+
+            elif event.key == pygame.K_e:
+                # при листании диалога глушим текущий голос, потом переключаем реплику
+                VOICE_CHANNEL.stop()
                 res = current_scene.interact()
                 if res:
                     current_scene = res
-            if event.key == pygame.K_q:
+
+            elif event.key == pygame.K_q:
                 current_scene.toggle_inventory()
 
-    # обновляем позицию игрока до отрисовки
+            # ---- управление звуком (по желанию) ----
+            elif event.key == pygame.K_m:
+                VOICE_CHANNEL.stop()
+                VOICE_ENABLED = not VOICE_ENABLED
+            elif event.key == pygame.K_LEFTBRACKET:   # [
+                VOICE_VOLUME = max(0.0, VOICE_VOLUME - 0.1); VOICE_CHANNEL.set_volume(VOICE_VOLUME)
+            elif event.key == pygame.K_RIGHTBRACKET:  # ]
+                VOICE_VOLUME = min(1.0, VOICE_VOLUME + 0.1); VOICE_CHANNEL.set_volume(VOICE_VOLUME)
+
+    # ---------- управление персонажем ----------
     keys = pygame.key.get_pressed()
     if not current_scene.inventory_open and current_scene.text_window.mode != "dialog":
         if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -190,9 +244,11 @@ while running:
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             current_scene.move_right()
 
+    # ---------- логика сцены и отрисовка ----------
     scene_info = current_scene.get_draw_data()
     screen.fill((0, 0, 0))
 
+    # Порядок отрисовки объектов + игрок
     sorted_objects = scene_info["objects"] + [scene_info["player"]]
     sorted_objects.sort(key=cmp_to_key(cmp_objects))
 
@@ -202,13 +258,27 @@ while running:
         y_t = int(rect.y1 * SCALE)
         width = int((rect.x2 - rect.x1) * SCALE)
         height = int((rect.y2 - rect.y1) * SCALE)
-    
-        if (obj["texture_path"] is not None):
+
+        if obj["texture_path"] is not None:
             sprite = pygame.image.load(obj["texture_path"]).convert_alpha()
             sprite = pygame.transform.scale(sprite, (width, height))
             rect = sprite.get_rect(topleft=(x_l, y_t))
             screen.blit(sprite, rect)
 
+    # ---------- авто-проигрывание озвучки по смене строки ----------
+    ui = scene_info["ui"]
+    if _last_ui_mode == "dialog" and ui["mode"] != "dialog":
+        VOICE_CHANNEL.stop()  # вышли из диалога — остановить голос
+
+    if ui["mode"] == "dialog":
+        if ui["text"] != _last_dialog_text or ui.get("voice_path") != _last_voice_path:
+            _play_voice(ui.get("voice_path"))  # voice_path задаётся в сценах для конкретной реплики
+
+    _last_ui_mode = ui["mode"]
+    _last_dialog_text = ui["text"] if ui["mode"] == "dialog" else None
+    _last_voice_path = ui.get("voice_path") if ui["mode"] == "dialog" else None
+
+    # ---------- поверх — UI ----------
     if scene_info["inventory"]["open"]:
         draw_inventory(scene_info["inventory"]["items"])
     elif scene_info["ui"]["mode"] == "dialog":

@@ -1,11 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional, Tuple, Literal
+from typing import Callable, List, Optional, Tuple, Literal, Union, Dict, Any
 from data_helper import add_inventory_item, load_inventory
 import math
 
 Vec2 = Tuple[float, float]
-
+DialogLine = Union[str, Dict[str, Any]]  # {"text": "...", "voice": "path.ogg"} или просто "..."
 
 # ==========================
 # Геометрия и утилиты
@@ -55,21 +55,29 @@ class TextWindow:
     mode: Mode = "hidden"
     text: str = ""
     source_object_id: Optional[str] = None
+    voice_path: Optional[str] = None  # <— НОВОЕ
 
     def show_hint(self, text: str, source_object_id: Optional[str]) -> None:
         self.mode = "hint"
         self.text = text
         self.source_object_id = source_object_id
+        self.voice_path = None  # <— чтобы подсказки не трогали озвучку
 
-    def show_dialog(self, text: str, source_object_id: Optional[str]) -> None:
+    def show_dialog(self, line: DialogLine, source_object_id: Optional[str] = None) -> None:
         self.mode = "dialog"
-        self.text = text
+        if isinstance(line, dict):
+            self.text = str(line.get("text", ""))
+            self.voice_path = line.get("voice")
+        else:
+            self.text = str(line)
+            self.voice_path = None
         self.source_object_id = source_object_id
 
     def hide(self) -> None:
         self.mode = "hidden"
         self.text = ""
         self.source_object_id = None
+        self.voice_path = None
 
 
 # ==========================
@@ -112,11 +120,12 @@ class GameObject:
 
 @dataclass
 class NPC(GameObject):
-    dialog_lines: List[str] = field(default_factory=list)
+    dialog_lines: List[DialogLine] = field(default_factory=list)  # <— было List[str]
     _dialog_index: int = 0
     repeatable: bool = False
     persist_progress: bool = True
     reward: Optional[Tuple[str, str]] = None
+
 
     def has_dialog(self) -> bool:
         return len(self.dialog_lines) > 0
@@ -127,7 +136,7 @@ class NPC(GameObject):
     def reset_dialog(self) -> None:
         self._dialog_index = 0
 
-    def next_dialog_line(self) -> Optional[str]:
+    def next_dialog_line(self) -> Optional[DialogLine]:  # <— тип возвращаемого значения
         if self._dialog_index < len(self.dialog_lines):
             line = self.dialog_lines[self._dialog_index]
             self._dialog_index += 1
@@ -147,6 +156,7 @@ class NPC(GameObject):
         if self.is_dialog_finished() and self.next_scene_factory:
             return self.next_scene_factory()
         return None
+
 
 
 @dataclass
@@ -400,6 +410,7 @@ class Scene:
                 "text": self.text_window.text,
                 "source_object_id": self.text_window.source_object_id,
                 "dialog_active_with": self._active_dialog_npc_id,
+                "voice_path": self.text_window.voice_path,  # <— НОВОЕ
             },
             "inventory": {
                 "open": self.inventory_open,
