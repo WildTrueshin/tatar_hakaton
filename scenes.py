@@ -36,7 +36,7 @@ def make_house_scene(
     )
     door = StaticObject(
         id="door_exit",
-        rect=Rect(80, 200, 120, 260),
+        rect=Rect(80, 100, 120, 160),
         solid=False,
         interactable=True,
         next_scene_factory=outside_factory,
@@ -122,7 +122,7 @@ def scene1() -> Scene:
         rect=Rect(238, 212, 258, 236),
         solid=False,
         interactable=False,
-        texture_path="sprites/objects/flower.png",
+        texture_path="sprites/objects/flower/flower.png",
         z=1,
     )
     return Scene(
@@ -169,13 +169,13 @@ def scene2() -> Scene:
         rect=Rect(238, 212, 258, 236),
         solid=False,
         interactable=False,
-        texture_path="sprites/objects/flower.png",
+        texture_path="sprites/objects/flower/flower.png",
         z=1,
     )
     babay_big = NPC(
         id="babay_big",
         name="Бабай",
-        rect=Rect(40, 212, 70, 255),
+        rect=Rect(10, 70, 80, 225),
         solid=False,
         interactable=True,
         dialog_lines=["Сәлам!"],
@@ -247,7 +247,7 @@ def scene3() -> Scene:
         rect=Rect(238, 212, 258, 236),
         solid=False,
         interactable=False,
-        texture_path="sprites/objects/flower.png",
+        texture_path="sprites/objects/flower/flower.png",
         z=1,
     )
     return Scene(
@@ -276,10 +276,10 @@ def scene4() -> Scene:
     ebi_big = NPC(
         id="ebi_big",
         name="Әби",
-        rect=Rect(40, 190, 90, 280),
-       solid=False,
+        rect=Rect(10, 70, 100, 225),
+        solid=False,
         interactable=True,
-        dialog_lines=["Исәнмесез, бир миңа чәчәк"],
+        dialog_lines=["Исәнмесез, миңа чәчәк тап"],
         repeatable=False,
         persist_progress=True,
         texture_path="sprites/objects/grandma.png",
@@ -291,7 +291,7 @@ def scene4() -> Scene:
         id="scene4",
         objects=[background, ebi_big],
         player_pos=(-100, -100),
-        player_size=(90, 90),
+        player_size=(35, 35),
         player_texture_path="sprites/bahtiyar/down0.png",
         player_z=1,
     )
@@ -350,7 +350,7 @@ def scene5() -> Scene:
         solid=False,
         interactable=True,
         next_scene_factory=scene6,
-        texture_path="sprites/objects/flower_highlited.png",
+        texture_path="sprites/objects/flower/flower_highlited.png",
         z=1,
     )
     return Scene(
@@ -403,15 +403,15 @@ def scene6() -> Scene:
     flower_big = NPC(
         id="flower_big",
         name="Чәчәк",
-        rect=Rect(238, 212, 258, 236),
+        rect=Rect(208, 112, 278, 212),
         solid=False,
         interactable=True,
         dialog_lines=["Чәчәк"],
         repeatable=False,
         persist_progress=True,
-        texture_path="sprites/objects/flower.png",
+        texture_path="sprites/objects/flower/flower.png",
         z=1,
-        reward=("чәчәк", "sprites/objects/flower.png"),
+        reward=("чәчәк", "sprites/objects/flower/flower.png"),
         next_scene_factory=scene7,
     )
     scene = Scene(
@@ -496,7 +496,7 @@ def scene8() -> Scene:
     ebi_big = NPC(
         id="ebi_big_final",
         name="Әби",
-        rect=Rect(38, 190, 90, 280),
+        rect=Rect(10, 70, 100, 225),
         solid=False,
         interactable=True,
         dialog_lines=["Рәхмәт"],
